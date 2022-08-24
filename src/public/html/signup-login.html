@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
+
+    <title>Login/Cadastro</title>
+</head>
+
+<!-- Consegui pegar Apenas Dados do Login, e Apenas dados do Registro com DOIS Formulários para Cada, porque antes estava Tudo em UM ÚNICO Form,
+  e por isso, pegava os Dados dos Login e do Registro JUNTOS !! << -->
+  
+<body>
+    <div class="login-wrap">
+        <div class="login-html">
+            <input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1"
+                class="tab">Entrar</label>
+            <input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab">Registrar</label>
+            <div class="login-form">
+                <div class="sign-in-htm">
+                    <form id="loginForm" method="post">
+                        <div class="group">
+                            <label for="pass" class="label">Email</label>
+                            <input id="pass" type="text" class="input" name="loginEmail" value="login">
+                        </div>
+                        <div class="group">
+                            <label for="pass" class="label">Senha</label>
+                            <input id="pass" type="password" class="input" data-type="password" name="loginPassword" value="login">
+                        </div>
+                        <div class="group">
+                            <input id="check" type="checkbox" class="check" checked>
+                            <!-- <label for="check"><span class="icon"></span> Keep me Signed in</label> Ver isso mais pra frente... -->
+                        </div>
+                        <div class="group">
+                            <input type="submit" class="button" value="Entrar">
+                        </div>
+                        <div class="hr"></div>
+                        <div class="foot-lnk">
+                            <a href="#forgot">Esqueceu a senha?</a> <!-- Mudar o href depois para alguma Rota !! << -->
+                        </div>
+                </div>
+                    </form>
+
+                <form id="registerForm" method="post">
+                <div class="sign-up-htm">
+                    <div class="group">
+                        <label for="user" class="label">Usuário</label>
+                        <input id="user" type="text" class="input" name="registerUsername" value="register">
+                    </div>
+                    <div class="group">
+                        <label for="pass" class="label">Email</label>
+                        <input id="pass" type="text" class="input" name="registerEmail" value="register">
+                    </div>
+                    <div class="group">
+                        <label for="pass" class="label">Senha</label>
+                        <input id="pass" type="password" class="input" data-type="password" name="registerPassword" value="register">
+                    </div>
+                    <div class="group">
+                        <label for="pass" class="label">Confirme a senha</label>
+                        <input id="pass" type="password" class="input" data-type="password" name="registerConfirmPassword" value="register">
+                    </div>
+                 </form>
+
+                    <div class="group">
+                        <input type="submit" class="button" value="Registrar">
+                    </div>
+                    <div class="hr"></div>
+                    <div class="foot-lnk">
+                        <label for="tab-1">Já está registrado?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
