@@ -1,25 +1,25 @@
-import session from 'cookie-session'
 import path from "path";
-import bodyParser from 'body-parser';
 import { Request, Response, Router } from "express";
 import { AccountController } from '../controllers/AccountController'
 
 const registerLoginRoute = Router();
 
-const __dirname = path.resolve()
+const __dirname = path.resolve();
 
-const registerLoginRouteHTML = path.join(__dirname, '/src/public/html/signup-login.html');
+const objectEJS = {
+    invalidData: ''
+}
 
-registerLoginRoute.use(bodyParser.urlencoded({extended: true}));
-registerLoginRoute.use(bodyParser.json());
-registerLoginRoute.use(bodyParser.text({ type: 'text/json' }));
+const registerLoginRouteHTML = path.join(__dirname, '/src/views/signup-login.ejs');
 
 registerLoginRoute.get('/account', (req: Request, res: Response) => {
-    console.log('Você está na página de registro !');
-    res.sendFile(registerLoginRouteHTML);
+    req.flash('success', 'teste boy...');
+    res.render(registerLoginRouteHTML, objectEJS);
+                                //, {teste: 'FODASE KKK'} << Exemplo q pode ser usado no .ejs !! <<
 })
 
 registerLoginRoute.post('/account', new AccountController().registerOrLoginAccount, (req: Request, res: Response) => {
+    res.redirect('/account');
 })
 
 export default registerLoginRoute;

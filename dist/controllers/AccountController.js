@@ -42,13 +42,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AccountController = void 0;
 var path_1 = __importDefault(require("path"));
 var __dirname = path_1.default.resolve();
-var registerLoginRouteHTML = path_1.default.join(__dirname, '/src/public/html/signup-login.html');
+var registerLoginRouteHTML = path_1.default.join(__dirname, '/src/views/signup-login.ejs');
+var administrationRouteHTML = path_1.default.join(__dirname, '/src/views/admin-panel.ejs');
 var AccountController = (function () {
     function AccountController() {
     }
-    AccountController.prototype.registerOrLoginAccount = function (req, res) {
+    AccountController.prototype.registerOrLoginAccount = function (req, res, next) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, registerUsername, registerEmail, registerPassword, registerConfirmPassword, _b, loginEmail, loginPassword;
+            var _a, registerUsername, registerEmail, registerPassword, registerConfirmPassword, _b, loginEmail, loginPassword, invalidData;
             return __generator(this, function (_c) {
                 console.log('req.body INTEIRO:', req.body);
                 _a = req.body, registerUsername = _a.registerUsername, registerEmail = _a.registerEmail, registerPassword = _a.registerPassword, registerConfirmPassword = _a.registerConfirmPassword;
@@ -68,8 +69,27 @@ var AccountController = (function () {
                 }
                 else {
                     console.log('INVÁLIDO !');
-                    return [2, res.sendFile(registerLoginRouteHTML)];
+                    invalidData = 'invalidData';
+                    return [2, res.render(registerLoginRouteHTML, { invalidData: invalidData })];
                 }
+                next();
+                return [2];
+            });
+        });
+    };
+    AccountController.prototype.adminPanelLogin = function (req, res, next) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, email, password;
+            return __generator(this, function (_b) {
+                _a = req.body, email = _a.email, password = _a.password;
+                if (!email || !password) {
+                    console.log('Dados inexistentes !');
+                    return [2, res.render(administrationRouteHTML)];
+                }
+                console.log('req.body INTEIRO:', req.body);
+                console.log('Email:', email);
+                console.log('Password:', password);
+                next();
                 return [2];
             });
         });
