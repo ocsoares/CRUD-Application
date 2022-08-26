@@ -9,6 +9,7 @@ var path_1 = __importDefault(require("path"));
 var database_1 = require("./database");
 var register_login_route_1 = __importDefault(require("./routes/register-login.route"));
 var administration_route_1 = __importDefault(require("./routes/administration.route"));
+var dashboard_route_1 = __importDefault(require("./routes/dashboard.route"));
 var cors_1 = __importDefault(require("cors"));
 var cookie_session_1 = __importDefault(require("cookie-session"));
 var cookie_parser_1 = __importDefault(require("cookie-parser"));
@@ -37,7 +38,9 @@ database_1.AppDataSource.initialize().then(function () {
     server.use((0, cors_1.default)());
     server.use(express_1.default.static(__dirname + '/src/views'));
     server.use(express_1.default.static(__dirname + '/src/public'));
+    server.use(express_1.default.static(__dirname + '/dist'));
     server.use(register_login_route_1.default);
+    server.use(dashboard_route_1.default);
     server.use(administration_route_1.default);
     return server.listen(process.env.PORT || port, function () {
         if (process.env.NODE_ENV === 'production') {

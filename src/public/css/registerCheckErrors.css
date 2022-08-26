@@ -1,0 +1,41 @@
+form input[type=text], [type=password], [type=number], [type=tel]:focus{ /* TIRA a Borda Padrão de quando Aperta em um Input !! */
+    outline: 0;
+}
+
+form input[type=submit], button{
+    cursor: pointer; /* Torna o Botão CLICÁVEL !! */
+    transition: 1s; /* Acrescenta um Delay no Efeito ABAIXO !! */
+} 
+
+form input[type=submit], button:hover{ /* Efeito de quando Passa o Mouse por Cima muda a Cor !! */
+    background-color: #4a5f64;
+}
+
+/* Estilizando o Error ou Success !! */
+
+/* Bordas  */
+.form-input.success input{
+    border-color: #2eec71;
+}
+
+.form-input.error input{
+    border-color: #e74c3c;
+}
+
+/* Icons */
+.form-input.success i.fa-check-circle{ /* Dentro da Borda selecionada, pega um Determinado Icon e Customiza (Borda + i + Classe do Icon !! SEM a Palavra INCIAL (ex: fas + resto...) !! */
+    color: #2eec71;
+    visibility: visible;
+}
+
+.form-input.error i.fa-exclamation-circle{
+    position: fixed; /* Position fixed para PODER ALTERAR a Posição do Icon !! << */
+    color: #e74c3c;
+    visibility: visible;
+}
+
+/* Mensagem de Erro - Óbviamente NÃO precisa de uma Mensagem para success !! << */
+.form-input.error small{
+    visibility: visible;
+    color: #e74c3c;
+}

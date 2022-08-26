@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { AccountRepository } from '../repositories/AccountRepository'
 import path from "path";
+import bcrypt from 'bcrypt'
 
 const __dirname = path.resolve();
 
@@ -13,10 +14,36 @@ const administrationRouteHTML = path.join(__dirname, '/src/views/admin-panel.ejs
 
 // Pesquisar e APLICAR aquelas Flash Messages !! <<
 
+// Fazer um Sistema de ALTERA a Senha !! <<
+
+    // Para funcionar aqui no Controller, tenho que colocar esse Objeto AQUI e nas Rotas !! <<
+    //  OBS: Também tenho que passar esse Objeto no .render !! <<
+
+// Adicionar no Banco de Dados A DATA que a Conta foi criada !! <<
+
 export class AccountController{
     async registerOrLoginAccount(req: Request, res: Response, next: NextFunction){
-        console.log('req.body INTEIRO:', req.body);
 
+            // Para funcionar aqui no Controller, tenho que colocar esse Objeto AQUI e nas Rotas !! <<
+            //  OBS: Também tenho que passar esse Objeto no .render !! <<
+            //  OBS: Tive que colocar aqui DENTRO para "resetar" a cada Chamada, pq os valores tavam ficando Fixo...
+        let objectAlertEJS: any = {
+            invalidData: undefined,
+            userExists: undefined,
+            emailExists: undefined,
+            invalidEmail: undefined,
+            successRegister: undefined,
+            differentPasswords: undefined,
+            internalServerError: undefined,
+            errorLogin: undefined,
+            successLogin: undefined
+        }
+
+        console.log('Teste do obj EJS:', objectAlertEJS.invalidEmail);
+        console.log('req.body INTEIRO:', req.body);
+        // console.log('TESTE:', objectAlertEJS.userExists);
+
+            // Register DATA
         const { 
             registerUsername,
             registerEmail,
@@ -24,40 +51,114 @@ export class AccountController{
             registerConfirmPassword,
          } = req.body
 
+            // Login DATA
          const { loginEmail, loginPassword } = req.body
 
             // REGISTRO !!! <<<<<<<<
         if(registerUsername && registerEmail && registerPassword && registerConfirmPassword){
-            console.log('REGISTRO !!');
 
-            console.log('req.body Register:', {
-                registerUsername,
-                registerEmail,
-                registerPassword,
-                registerConfirmPassword
-            });
+            const regexEmail = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
 
+            const searchUserByUsername = await AccountRepository.findOneBy({username: registerUsername});
+            const searchUserByEmail = await AccountRepository.findOneBy({email: registerEmail})
+
+
+            if(searchUserByUsername){
+                objectAlertEJS.userExists = true;
+                return res.render(registerLoginRouteHTML, objectAlertEJS);
+            }
+
+            else{
+                objectAlertEJS.userExists = false;
+            }
+
+            if(searchUserByEmail){
+                objectAlertEJS.emailExists = true;
+                return res.render(registerLoginRouteHTML, objectAlertEJS);
+            }
+
+            else{
+                objectAlertEJS.emailExists = false;
+            }
+
+            if(!registerEmail.match(regexEmail)){
+                objectAlertEJS.invalidEmail = true
+                return res.render(registerLoginRouteHTML, objectAlertEJS);
+            }
+
+            else{
+                objectAlertEJS.invalidEmail = false;
+            }
+
+            if(registerPassword !== registerConfirmPassword){
+                objectAlertEJS.differentPasswords = true;
+                return res.render(registerLoginRouteHTML, objectAlertEJS);
+            }
+
+            else{
+                objectAlertEJS.differentPasswords = false;
+            }
+
+            const encryptPassword = await bcrypt.hash(registerPassword, 10);
+
+            if(!encryptPassword){
+                objectAlertEJS.internalServerError = true;
+                return res.render(registerLoginRouteHTML, objectAlertEJS);
+            }
+
+            else{
+                objectAlertEJS.internalServerError = false;
+            }
+
+            const saveNewAccount = AccountRepository.create({
+                type: "user" ,
+                username: registerUsername,
+                email: registerEmail,
+                password: encryptPassword
+            })
+
+            await AccountRepository.save(saveNewAccount);            
+
+            objectAlertEJS.successRegister = true
+            return res.render(registerLoginRouteHTML, objectAlertEJS);
         }
         // --------------------------------
 
 
             // LOGIN !!! <<<<<<<<
         else if(loginEmail && loginPassword){
-            console.log('LOGIN !!');
+            const searchUserByEmail = await AccountRepository.findOneBy({email: loginEmail})
 
-            console.log('req.body Login:', loginEmail, loginPassword);
+            if(!searchUserByEmail){
+                objectAlertEJS.errorLogin = true;
+                return res.render(registerLoginRouteHTML, objectAlertEJS);
+            }
+
+            const verifyPassword = await bcrypt.compare(loginPassword, searchUserByEmail.password);
+
+            if(!verifyPassword){
+                objectAlertEJS.errorLogin = true
+                return res.render(registerLoginRouteHTML, objectAlertEJS);
+            }
+
+                // TENTAR COLOCAR ISSO NO DASHBOARD quando CONSEGUIR Logar !! <<
+            // objectAlertEJS.successLogin = true;
+            // res.render(registerLoginRouteHTML, objectAlertEJS);
+
+            res.redirect('/dashboard');
+            
+            next();
         }
         // --------------------------------
 
         else{
             console.log('INVÁLIDO !');
 
-            const invalidData = 'invalidData';
+            objectAlertEJS.invalidData = true;
 
-            return res.render(registerLoginRouteHTML, { invalidData });
+            return res.render(registerLoginRouteHTML, objectAlertEJS);
         }
 
-        next();
     }
     
     async adminPanelLogin(req: Request, res: Response, next: NextFunction){
