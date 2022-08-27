@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express"
 import { AccountRepository } from '../repositories/AccountRepository'
 import path from "path";
 import bcrypt from 'bcrypt'
+import cookieParser from "cookie-parser";
+import jwt from 'jsonwebtoken';
 
 const __dirname = path.resolve();
 
@@ -11,6 +13,7 @@ const administrationRouteHTML = path.join(__dirname, '/src/views/admin-panel.ejs
 // PROCURAR UMA Layout Form para ADMIN e fazer uma Rota para Login de Admin's !! <<<
 //  OBS: Os admins vão ser setados Diretamente no Banco de Dados, Alterando o type (acho....) !! <<
 // >> Nessa lógica, todos os Usuários Registrado AQUI NÃO serão admin's !! <<
+// Query Command: UPDATE accounts SET type = 'admin' WHERE id = ...
 
 // Pesquisar e APLICAR aquelas Flash Messages !! <<
 
@@ -145,6 +148,18 @@ export class AccountController{
             // objectAlertEJS.successLogin = true;
             // res.render(registerLoginRouteHTML, objectAlertEJS);
 
+            const JWTCookie = jwt.sign({
+                id: searchUserByEmail.id,
+                username: searchUserByEmail.username,
+                email: searchUserByEmail.email
+            }, "" + process.env.JWT_HASH, {
+                expiresIn: '12h',
+            });
+
+            res.cookie('session_app', JWTCookie, {
+                httpOnly: true
+            })
+
             res.redirect('/dashboard');
             
             next();
@@ -162,17 +177,67 @@ export class AccountController{
     }
     
     async adminPanelLogin(req: Request, res: Response, next: NextFunction){
-        const { email, password } = req.body
 
-        if(!email || !password){
-            console.log('Dados inexistentes !');
-            return res.render(administrationRouteHTML);
-        }
+        let objectAlertEJS: any = {
+            invalidData: undefined,
+            userExists: undefined,
+            emailExists: undefined,
+            invalidEmail: undefined,
+            successRegister: undefined,
+            differentPasswords: undefined,
+            internalServerError: undefined,
+            errorLogin: undefined,
+            successLogin: undefined
+        };
+
+        const { adminEmail, adminPassword } = req.body
 
         console.log('req.body INTEIRO:', req.body);
 
-        console.log('Email:', email);
-        console.log('Password:', password);
+        if(!adminEmail || !adminPassword){
+            objectAlertEJS.invalidData = true
+            return res.render(administrationRouteHTML, objectAlertEJS);
+        }
+
+        else{
+            objectAlertEJS.invalidData = false
+        }
+
+        const searchUserAdminByEmail = await AccountRepository.findOneBy({email: adminEmail});
+
+        if(!searchUserAdminByEmail){
+            objectAlertEJS.errorLogin = true;
+            return res.render(administrationRouteHTML, objectAlertEJS);
+        }
+
+        else{
+            objectAlertEJS.errorLogin = false;
+        }
+
+        console.log('TYPE ADMIN:', searchUserAdminByEmail.type);
+
+        if(searchUserAdminByEmail.type !== 'admin' as any){
+            console.log('NÃO É ADMIN KK !!');
+            objectAlertEJS.errorLogin = true;
+            return res.render(administrationRouteHTML, objectAlertEJS);
+        }
+
+        else{
+            objectAlertEJS.errorLogin = false;
+        }
+
+        const verifyAdminPassword = await bcrypt.compare(adminPassword, searchUserAdminByEmail.password);
+
+        if(!verifyAdminPassword){
+            objectAlertEJS.errorLogin = true;
+            return res.render(administrationRouteHTML, objectAlertEJS);
+        }
+
+        else{
+            objectAlertEJS.errorLogin = false;
+        }
+
+        res.redirect('/administration');
 
         next();
     }

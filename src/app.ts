@@ -25,16 +25,16 @@ AppDataSource.initialize().then(() => {
 
     server.use(cookieParser(process.env.COOKIE_SECRET));
 
-    server.use(session({
-        name: 'session_app',
-        secret: process.env.COOKIE_SECRET,
-        keys: [process.env.COOKIE_SECRET as string],
-        sameSite: 'strict',
-        secure: process.env.COOKIE_SECRET === 'production' ? true : false,
-        httpOnly: true
-    }));
+    // server.use(session({
+    //     name: 'session_app',
+    //     secret: process.env.COOKIE_SECRET,
+    //     keys: [process.env.COOKIE_SECRET as string],
+    //     sameSite: 'strict',
+    //     secure: process.env.COOKIE_SECRET === 'production' ? true : false,
+    //     httpOnly: true
+    // }));
 
-    server.use(connectFlash());
+    // server.use(connectFlash());
 
     server.use(bodyParser.urlencoded({ extended: true }));
     server.use(bodyParser.json());
