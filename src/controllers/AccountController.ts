@@ -15,8 +15,6 @@ const administrationRouteHTML = path.join(__dirname, '/src/views/admin-panel.ejs
 // >> Nessa lógica, todos os Usuários Registrado AQUI NÃO serão admin's !! <<
 // Query Command: UPDATE accounts SET type = 'admin' WHERE id = ...
 
-// Pesquisar e APLICAR aquelas Flash Messages !! <<
-
 // Fazer um Sistema de ALTERA a Senha !! <<
 
     // Para funcionar aqui no Controller, tenho que colocar esse Objeto AQUI e nas Rotas !! <<
@@ -113,11 +111,14 @@ export class AccountController{
                 objectAlertEJS.internalServerError = false;
             }
 
+            const createdDate = new Date().toLocaleDateString('pt-BR'); // Data atual, APENAS O Dia/Mes/Ano, SEM o Horário !! <<
+
             const saveNewAccount = AccountRepository.create({
                 type: "user" ,
                 username: registerUsername,
                 email: registerEmail,
-                password: encryptPassword
+                password: encryptPassword,
+                createdDate
             })
 
             await AccountRepository.save(saveNewAccount);            
@@ -236,6 +237,18 @@ export class AccountController{
         else{
             objectAlertEJS.errorLogin = false;
         }
+
+        const JWTCookie = jwt.sign({
+            id: searchUserAdminByEmail.id,
+            username: searchUserAdminByEmail.username,
+            email: searchUserAdminByEmail.email
+        }, "" + process.env.JWT_HASH, {
+            expiresIn: '12h'
+        })
+
+        res.cookie('session_admin', JWTCookie, {
+            httpOnly: true
+        })
 
         res.redirect('/administration');
 

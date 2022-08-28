@@ -16,4 +16,7 @@ export class Account{
 
     @Column({type: 'text', nullable: false})
     type: 'user' | 'admin' 
+
+    @Column({type: 'text', nullable: false})
+    createdDate: string
 }

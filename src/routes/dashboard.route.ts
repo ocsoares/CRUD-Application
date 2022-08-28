@@ -4,7 +4,7 @@ import { VerificationAccount } from "../controllers/VerificationsAccount";
 
 const dashboardRoute = Router();
 
-dashboardRoute.get('/dashboard', (req: Request, res: Response) => {
+dashboardRoute.get('/dashboard', new VerificationAccount().checkIfUserAreLogged, (req: Request, res: Response) => {
     res.json({message: 'LOGADO !'});
 })
 
