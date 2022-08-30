@@ -4,6 +4,7 @@ import { AccountController } from '../controllers/AccountController'
 import { VerificationAccount } from "../controllers/VerificationsAccount";
 import cookieParser from "cookie-parser";
 import session from 'cookie-session'
+import { sendNodemailerToResetPass } from "../scripts/nodemailer.script";
 
 const registerLoginRoute = Router();
 
@@ -22,7 +23,8 @@ const __dirname = path.resolve();
 
     // Para funcionar aqui nas Rotas, tenho que colocar esse Objeto AQUI e no Controller !! <<
     //  OBS: Também tenho que passar esse Objeto no .render !! <<
-const objectAlertEJS = {
+    // >> Tentar colocar isso como MIDDLEWARE GLOBAL em uma req. ou req.locals.  !! <<
+let objectAlertEJS: any = {
     invalidData: undefined,
     userExists: undefined,
     emailExists: undefined,
@@ -31,14 +33,20 @@ const objectAlertEJS = {
     differentPasswords: undefined,
     internalServerError: undefined,
     errorLogin: undefined,
-    successLogin: undefined
+    successLogin: undefined,
+    errorForgotPassword: undefined,
+    successToSendEmail: undefined,
+    errorChangeForgotPassword: undefined,
+    successChangeForgotPassword: undefined,
+    passwordAlreadyChanged: undefined,
+    invalidToken: undefined
 };
 
 const registerLoginRouteEJS = path.join(__dirname, '/src/views/signup-login.ejs');
 const forgotPasswordEJS = path.join(__dirname, '/src/views/forgotpassword.ejs');
+const changeForgotPasswordEJS = path.join(__dirname, '/src/views/changeforgotpassword.ejs');
 
 registerLoginRoute.get('/account', new VerificationAccount().blockRegisterLoginPageIfLogged, (req: Request, res: Response) => {
-    console.log('sdjinfiso')
     res.render(registerLoginRouteEJS, objectAlertEJS);
                                 //, {teste: 'FODASE KKK'} << Exemplo q pode ser usado no .ejs !! <<
 })
@@ -52,12 +60,23 @@ registerLoginRoute.get('/logout', new VerificationAccount().checkIfUserAreLogged
     res.json({message: 'Deslogado !'});
 })
 
-registerLoginRoute.get('/forgotpassword/:codeSendToEmail', new VerificationAccount().checkIfUserAreLogged, (req: Request, res: Response) => {
+registerLoginRoute.get('/forgotpassword', new VerificationAccount().blockRegisterLoginPageIfLogged, (req: Request, res: Response) => {
     res.render(forgotPasswordEJS, objectAlertEJS);
 })
 
-registerLoginRoute.get('/changepassword', new VerificationAccount().checkIfUserAreLogged, (req: Request, res: Response) => {
-    res.json({message: 'Alterando a senha...'});
+registerLoginRoute.post('/forgotpassword', new VerificationAccount().blockRegisterLoginPageIfLogged,
+new AccountController().forgotPassword, sendNodemailerToResetPass(), (req: Request, res: Response) => {
+    // Fazer um Verification() que retorna um Render para Colocar mensagem de ERRO ou Sucesso !! <<
+})
+
+    // FAZER um Middleware para Verificar se o JWT é válido !! << PENSAR se tem que por no POST também, ACHO que não...
+registerLoginRoute.get('/changepassword/:JWT', new VerificationAccount().blockRegisterLoginPageIfLogged, 
+new AccountController().checkJWTParamsChangePassword, (req: Request, res: Response) => {
+    res.render(changeForgotPasswordEJS, objectAlertEJS);
+})
+
+registerLoginRoute.post('/changepassword/:JWT', new VerificationAccount().blockRegisterLoginPageIfLogged, 
+new AccountController().changeForgotPassword, (req: Request, res: Response) => {
 })
 
 export default registerLoginRoute;

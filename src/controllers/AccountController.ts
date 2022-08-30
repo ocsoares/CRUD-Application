@@ -3,12 +3,16 @@ import { AccountRepository } from '../repositories/AccountRepository'
 import path from "path";
 import bcrypt from 'bcrypt'
 import cookieParser from "cookie-parser";
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { ResetPasswordsRepository } from "../repositories/ResetPasswordsRepository";
+import { ResetPasswords } from "../database/entity/ResetPasswords";
 
 const __dirname = path.resolve();
 
 const registerLoginRouteHTML = path.join(__dirname, '/src/views/signup-login.ejs');
 const administrationRouteHTML = path.join(__dirname, '/src/views/admin-panel.ejs');
+const forgotPasswordEJS = path.join(__dirname, '/src/views/forgotpassword.ejs');
+const changeForgotPasswordEJS = path.join(__dirname, '/src/views/changeforgotpassword.ejs');
 
 // PROCURAR UMA Layout Form para ADMIN e fazer uma Rota para Login de Admin's !! <<<
 //  OBS: Os admins vão ser setados Diretamente no Banco de Dados, Alterando o type (acho....) !! <<
@@ -21,6 +25,16 @@ const administrationRouteHTML = path.join(__dirname, '/src/views/admin-panel.ejs
     //  OBS: Também tenho que passar esse Objeto no .render !! <<
 
 // Adicionar no Banco de Dados A DATA que a Conta foi criada !! <<
+
+// Colocar Tamanho MÍNIMO para Usuários e Senhas !! <<
+
+// Bloquear um Email de Alterar a Senha SE JÁ Bloqueou Recentemente !! <<
+
+// Fazer uma Pequena LOGO de Home para voltar a Página de Login/Register !! <<
+
+// CACHEAR com Redis o JWT usado no Logout e no RESET da Senha !! <<
+
+// Aprender o Connect-flash e Usar nas Rotas que NÃO da para mandar Mensagem depois de Redirecionado  (ex. Reset Pass) !! <<
 
 export class AccountController{
     async registerOrLoginAccount(req: Request, res: Response, next: NextFunction){
@@ -145,10 +159,6 @@ export class AccountController{
                 return res.render(registerLoginRouteHTML, objectAlertEJS);
             }
 
-                // TENTAR COLOCAR ISSO NO DASHBOARD quando CONSEGUIR Logar !! <<
-            // objectAlertEJS.successLogin = true;
-            // res.render(registerLoginRouteHTML, objectAlertEJS);
-
             const JWTCookie = jwt.sign({
                 id: searchUserByEmail.id,
                 username: searchUserByEmail.username,
@@ -253,5 +263,220 @@ export class AccountController{
         res.redirect('/administration');
 
         next();
+    }
+
+    async forgotPassword(req: Request, res: Response, next: NextFunction){
+
+        let objectAlertEJS: any = {
+            invalidData: undefined,
+            errorForgotPassword: undefined,
+            internalServerError: undefined,
+            successToSendEmail: undefined,
+            passwordAlreadyChanged: undefined
+        };
+
+        const { forgotUsername, forgotEmail } = req.body
+
+        const searchUserByEmail = await AccountRepository.findOneBy({email: forgotEmail});
+
+        if(!searchUserByEmail){
+            objectAlertEJS.errorForgotPassword = true;
+            return res.render(forgotPasswordEJS, objectAlertEJS);
+        }
+
+        else{
+            objectAlertEJS.errorForgotPassword = false;
+        }
+
+        if(forgotUsername !== searchUserByEmail.username){
+            objectAlertEJS.errorForgotPassword = true;
+            return res.render(forgotPasswordEJS, objectAlertEJS);
+        }
+
+        else{
+            objectAlertEJS.errorForgotPassword = false;
+        }
+
+        const newDate = new Date();
+        const currentTime = newDate.setMinutes(newDate.getMinutes());
+
+        const searchUserResetPassword = await ResetPasswordsRepository.findOneBy({email: searchUserByEmail?.email});
+
+        if(searchUserResetPassword){
+            if(currentTime < searchUserResetPassword?.minuteToResetAgain){
+                objectAlertEJS.passwordAlreadyChanged = true;
+                return res.render(forgotPasswordEJS, objectAlertEJS);
+            }
+
+            else{
+                objectAlertEJS.passwordAlreadyChanged = false;
+            }
+        }
+
+        const JWT = jwt.sign({
+            id: searchUserByEmail.id,
+            type: searchUserByEmail.type,
+            email: searchUserByEmail.email,
+            username: searchUserByEmail.username
+        },  "" + process.env.JWT_HASH, {
+            expiresIn: '15m'
+        });
+
+        req.JWT = JWT;
+
+        next();
+
+        objectAlertEJS.successToSendEmail = true;
+        return res.render(forgotPasswordEJS, objectAlertEJS);
+    }
+
+    async checkJWTParamsChangePassword(req: Request, res: Response, next: NextFunction){
+
+        let objectAlertEJS: any = {
+            invalidData: undefined,
+            differentPasswords: undefined,
+            internalServerError: undefined,
+            errorChangeForgotPassword: undefined,
+            successChangeForgotPassword: undefined,
+            invalidToken: undefined,
+            errorForgotPassword: undefined,
+            invalidEmail: undefined
+        };
+
+        const { JWT } = req.params
+
+        try{
+            const verifyJWT = jwt.verify(JWT, "" + process.env.JWT_HASH) as JwtPayload;
+
+            const { id } = verifyJWT;
+
+            const searchUserById = await AccountRepository.findOneBy({id});
+
+            if(!searchUserById){
+                objectAlertEJS.internalServerError = true;
+                return res.render(forgotPasswordEJS, objectAlertEJS);
+            }
+            else{
+                objectAlertEJS.internalServerError = false;
+            }
+        }
+        catch(error){
+            return res.redirect('/forgotpassword');
+        }
+
+        next();
+    }
+
+    async changeForgotPassword(req: Request, res: Response, next: NextFunction){
+
+        let objectAlertEJS: any = {
+            invalidData: undefined,
+            differentPasswords: undefined,
+            internalServerError: undefined,
+            successChangeForgotPassword: undefined,
+            invalidToken: undefined,
+            passwordAlreadyChanged: undefined
+        };
+
+        const { JWT } = req.params
+        const { newPassword, confirmNewPassword } = req.body;
+
+        if(!newPassword || !confirmNewPassword){
+            objectAlertEJS.invalidData = true;
+            return res.render(changeForgotPasswordEJS, objectAlertEJS);
+        }
+        else{
+            objectAlertEJS.invalidData = false;
+        }
+
+        if(newPassword !== confirmNewPassword){
+            objectAlertEJS.differentPasswords = true;
+            return res.render(changeForgotPasswordEJS, objectAlertEJS);
+        }
+        else{
+            objectAlertEJS.differentPasswords = false;
+        }
+
+        try{
+            const verifyJWT = jwt.verify(JWT, "" + process.env.JWT_HASH) as JwtPayload;
+            console.log('verifyJWT:', verifyJWT);
+
+            const { id, email, iat, exp } = verifyJWT;
+
+            const searchUserByEmail = await AccountRepository.findOneBy({email})
+
+            if(!searchUserByEmail){
+                objectAlertEJS.internalServerError = true;
+                return res.render(changeForgotPasswordEJS, objectAlertEJS);
+            }
+
+            else{
+                objectAlertEJS.internalServerError = false;
+            }
+
+                // O Token de Reset Password TEM que tem 15 Minutos de Expiração, então o Código abaixo EVITA ISSO !! >>
+            if(iat && exp){
+                if((exp - iat) / 60 !== 15){
+                    console.log('JWT INCORRETO !');
+                    return res.redirect('/forgotpassword');
+                }
+                else{
+                    console.log('JWT CORRETO !');
+                }
+            }
+
+            const encryptPassword = await bcrypt.hash(newPassword, 10) as any;
+            console.log('newPassword:', newPassword);
+            console.log('ENCRYPT:', encryptPassword);
+
+            await AccountRepository.update(id, {
+                password: encryptPassword
+            })
+
+            const currentDayMonthYear = new Date().toLocaleDateString('pt-BR');
+
+            const newDate = new Date();
+            const nextTimeToResetAgain = newDate.setMinutes(newDate.getMinutes() + 60);
+
+                // USAR PARA EVITAR QUE ATUALIZE A SENHA DENOVO NO MESMO TOKEN !! <<
+            const currentTime = newDate.setMinutes(newDate.getMinutes());
+
+            const searchUserResetPassword = await ResetPasswordsRepository.findOneBy({email: email});
+            console.log('PROCURE USERRESET:', searchUserResetPassword);
+            
+            if(!searchUserResetPassword){
+                const createUserResetPassword = ResetPasswordsRepository.create({
+                    email,
+                    oldPassword: searchUserByEmail.password,
+                    resetOnDate: currentDayMonthYear,
+                    minuteToResetAgain: nextTimeToResetAgain
+                });
+
+                await ResetPasswordsRepository.save(createUserResetPassword);
+            }
+
+            else{
+                await ResetPasswordsRepository.update(searchUserResetPassword.id, {
+                    minuteToResetAgain: nextTimeToResetAgain
+                });
+            }
+
+        }
+        catch(error){
+            console.log(error);
+
+            objectAlertEJS.invalidToken = true;
+            return res.render(changeForgotPasswordEJS, objectAlertEJS)
+        }
+
+        objectAlertEJS.invalidToken = false;
+
+        next();
+
+            // TENTAR COLOCAR UM AVISO COM FLASH MESSAGE !! <<
+        // objectAlertEJS.successChangeForgotPassword = true;
+        // return res.render(changeForgotPasswordEJS, objectAlertEJS);
+
+        res.redirect('/account');
     }
 }
