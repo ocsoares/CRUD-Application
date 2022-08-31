@@ -2,10 +2,8 @@ import { NextFunction, Request, Response } from "express"
 import { AccountRepository } from '../repositories/AccountRepository'
 import path from "path";
 import bcrypt from 'bcrypt'
-import cookieParser from "cookie-parser";
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { ResetPasswordsRepository } from "../repositories/ResetPasswordsRepository";
-import { ResetPasswords } from "../database/entity/ResetPasswords";
 
 const __dirname = path.resolve();
 
@@ -42,21 +40,6 @@ export class AccountController{
             // Para funcionar aqui no Controller, tenho que colocar esse Objeto AQUI e nas Rotas !! <<
             //  OBS: Também tenho que passar esse Objeto no .render !! <<
             //  OBS: Tive que colocar aqui DENTRO para "resetar" a cada Chamada, pq os valores tavam ficando Fixo...
-        let objectAlertEJS: any = {
-            invalidData: undefined,
-            userExists: undefined,
-            emailExists: undefined,
-            invalidEmail: undefined,
-            successRegister: undefined,
-            differentPasswords: undefined,
-            internalServerError: undefined,
-            errorLogin: undefined,
-            successLogin: undefined
-        }
-
-        console.log('Teste do obj EJS:', objectAlertEJS.invalidEmail);
-        console.log('req.body INTEIRO:', req.body);
-        // console.log('TESTE:', objectAlertEJS.userExists);
 
             // Register DATA
         const { 
@@ -79,50 +62,50 @@ export class AccountController{
 
 
             if(searchUserByUsername){
-                objectAlertEJS.userExists = true;
-                return res.render(registerLoginRouteHTML, objectAlertEJS);
+                res.locals.alerts.userExists = true;
+                return res.render(registerLoginRouteHTML, res.locals.alerts);
             }
 
             else{
-                objectAlertEJS.userExists = false;
+                res.locals.alerts.userExists = false;
             }
 
             if(searchUserByEmail){
-                objectAlertEJS.emailExists = true;
-                return res.render(registerLoginRouteHTML, objectAlertEJS);
+                res.locals.alerts.emailExists = true;
+                return res.render(registerLoginRouteHTML, res.locals.alerts);
             }
 
             else{
-                objectAlertEJS.emailExists = false;
+                res.locals.alerts.emailExists = false;
             }
 
             if(!registerEmail.match(regexEmail)){
-                objectAlertEJS.invalidEmail = true
-                return res.render(registerLoginRouteHTML, objectAlertEJS);
+                res.locals.alerts.invalidEmail = true
+                return res.render(registerLoginRouteHTML, res.locals.alerts);
             }
 
             else{
-                objectAlertEJS.invalidEmail = false;
+                res.locals.alerts.invalidEmail = false;
             }
 
             if(registerPassword !== registerConfirmPassword){
-                objectAlertEJS.differentPasswords = true;
-                return res.render(registerLoginRouteHTML, objectAlertEJS);
+                res.locals.alerts.differentPasswords = true;
+                return res.render(registerLoginRouteHTML, res.locals.alerts);
             }
 
             else{
-                objectAlertEJS.differentPasswords = false;
+                res.locals.alerts.differentPasswords = false;
             }
 
             const encryptPassword = await bcrypt.hash(registerPassword, 10);
 
             if(!encryptPassword){
-                objectAlertEJS.internalServerError = true;
-                return res.render(registerLoginRouteHTML, objectAlertEJS);
+                res.locals.alerts.internalServerError = true;
+                return res.render(registerLoginRouteHTML, res.locals.alerts);
             }
 
             else{
-                objectAlertEJS.internalServerError = false;
+                res.locals.alerts.internalServerError = false;
             }
 
             const createdDate = new Date().toLocaleDateString('pt-BR'); // Data atual, APENAS O Dia/Mes/Ano, SEM o Horário !! <<
@@ -137,8 +120,8 @@ export class AccountController{
 
             await AccountRepository.save(saveNewAccount);            
 
-            objectAlertEJS.successRegister = true
-            return res.render(registerLoginRouteHTML, objectAlertEJS);
+            res.locals.alerts.successRegister = true
+            return res.render(registerLoginRouteHTML, res.locals.alerts);
         }
         // --------------------------------
 
@@ -148,15 +131,18 @@ export class AccountController{
             const searchUserByEmail = await AccountRepository.findOneBy({email: loginEmail})
 
             if(!searchUserByEmail){
-                objectAlertEJS.errorLogin = true;
-                return res.render(registerLoginRouteHTML, objectAlertEJS);
+                // objectAlertEJS.errorLogin = true;
+                // res.locals.alerts.errorLogin = true;
+                // return res.render(registerLoginRouteHTML, res.locals.alerts);
+                req.flash
+                return res.redirect('/account');
             }
 
             const verifyPassword = await bcrypt.compare(loginPassword, searchUserByEmail.password);
 
             if(!verifyPassword){
-                objectAlertEJS.errorLogin = true
-                return res.render(registerLoginRouteHTML, objectAlertEJS);
+                res.locals.alerts.errorLogin = true
+                return res.render(registerLoginRouteHTML, res.locals.alerts);
             }
 
             const JWTCookie = jwt.sign({
@@ -180,72 +166,60 @@ export class AccountController{
         else{
             console.log('INVÁLIDO !');
 
-            objectAlertEJS.invalidData = true;
+            res.locals.alerts.invalidData = true;
 
-            return res.render(registerLoginRouteHTML, objectAlertEJS);
+            return res.render(registerLoginRouteHTML, res.locals.alerts);
         }
 
     }
     
     async adminPanelLogin(req: Request, res: Response, next: NextFunction){
 
-        let objectAlertEJS: any = {
-            invalidData: undefined,
-            userExists: undefined,
-            emailExists: undefined,
-            invalidEmail: undefined,
-            successRegister: undefined,
-            differentPasswords: undefined,
-            internalServerError: undefined,
-            errorLogin: undefined,
-            successLogin: undefined
-        };
-
         const { adminEmail, adminPassword } = req.body
 
         console.log('req.body INTEIRO:', req.body);
 
         if(!adminEmail || !adminPassword){
-            objectAlertEJS.invalidData = true
-            return res.render(administrationRouteHTML, objectAlertEJS);
+            res.locals.alerts.invalidData = true
+            return res.render(administrationRouteHTML, res.locals.alerts);
         }
 
         else{
-            objectAlertEJS.invalidData = false
+            res.locals.alerts.invalidData = false
         }
 
         const searchUserAdminByEmail = await AccountRepository.findOneBy({email: adminEmail});
 
         if(!searchUserAdminByEmail){
-            objectAlertEJS.errorLogin = true;
-            return res.render(administrationRouteHTML, objectAlertEJS);
+            res.locals.alerts.errorLogin = true;
+            return res.render(administrationRouteHTML, res.locals.alerts);
         }
 
         else{
-            objectAlertEJS.errorLogin = false;
+            res.locals.alerts.errorLogin = false;
         }
 
         console.log('TYPE ADMIN:', searchUserAdminByEmail.type);
 
         if(searchUserAdminByEmail.type !== 'admin' as any){
             console.log('NÃO É ADMIN KK !!');
-            objectAlertEJS.errorLogin = true;
-            return res.render(administrationRouteHTML, objectAlertEJS);
+            res.locals.alerts.errorLogin = true;
+            return res.render(administrationRouteHTML, res.locals.alerts);
         }
 
         else{
-            objectAlertEJS.errorLogin = false;
+            res.locals.alerts.errorLogin = false;
         }
 
         const verifyAdminPassword = await bcrypt.compare(adminPassword, searchUserAdminByEmail.password);
 
         if(!verifyAdminPassword){
-            objectAlertEJS.errorLogin = true;
-            return res.render(administrationRouteHTML, objectAlertEJS);
+            res.locals.alerts.errorLogin = true;
+            return res.render(administrationRouteHTML, res.locals.alerts);
         }
 
         else{
-            objectAlertEJS.errorLogin = false;
+            res.locals.alerts.errorLogin = false;
         }
 
         const JWTCookie = jwt.sign({
@@ -267,34 +241,26 @@ export class AccountController{
 
     async forgotPassword(req: Request, res: Response, next: NextFunction){
 
-        let objectAlertEJS: any = {
-            invalidData: undefined,
-            errorForgotPassword: undefined,
-            internalServerError: undefined,
-            successToSendEmail: undefined,
-            passwordAlreadyChanged: undefined
-        };
-
         const { forgotUsername, forgotEmail } = req.body
 
         const searchUserByEmail = await AccountRepository.findOneBy({email: forgotEmail});
 
         if(!searchUserByEmail){
-            objectAlertEJS.errorForgotPassword = true;
-            return res.render(forgotPasswordEJS, objectAlertEJS);
+            res.locals.alerts.errorForgotPassword = true;
+            return res.render(forgotPasswordEJS, res.locals.alerts);
         }
 
         else{
-            objectAlertEJS.errorForgotPassword = false;
+            res.locals.alerts.errorForgotPassword = false;
         }
 
         if(forgotUsername !== searchUserByEmail.username){
-            objectAlertEJS.errorForgotPassword = true;
-            return res.render(forgotPasswordEJS, objectAlertEJS);
+            res.locals.alerts.errorForgotPassword = true;
+            return res.render(forgotPasswordEJS, res.locals.alerts);
         }
 
         else{
-            objectAlertEJS.errorForgotPassword = false;
+            res.locals.alerts.errorForgotPassword = false;
         }
 
         const newDate = new Date();
@@ -304,12 +270,12 @@ export class AccountController{
 
         if(searchUserResetPassword){
             if(currentTime < searchUserResetPassword?.minuteToResetAgain){
-                objectAlertEJS.passwordAlreadyChanged = true;
-                return res.render(forgotPasswordEJS, objectAlertEJS);
+                res.locals.alerts.passwordAlreadyChanged = true;
+                return res.render(forgotPasswordEJS, res.locals.alerts);
             }
 
             else{
-                objectAlertEJS.passwordAlreadyChanged = false;
+                res.locals.alerts.passwordAlreadyChanged = false;
             }
         }
 
@@ -326,22 +292,11 @@ export class AccountController{
 
         next();
 
-        objectAlertEJS.successToSendEmail = true;
-        return res.render(forgotPasswordEJS, objectAlertEJS);
+        res.locals.alerts.successToSendEmail = true;
+        return res.render(forgotPasswordEJS, res.locals.alerts);
     }
 
     async checkJWTParamsChangePassword(req: Request, res: Response, next: NextFunction){
-
-        let objectAlertEJS: any = {
-            invalidData: undefined,
-            differentPasswords: undefined,
-            internalServerError: undefined,
-            errorChangeForgotPassword: undefined,
-            successChangeForgotPassword: undefined,
-            invalidToken: undefined,
-            errorForgotPassword: undefined,
-            invalidEmail: undefined
-        };
 
         const { JWT } = req.params
 
@@ -353,11 +308,11 @@ export class AccountController{
             const searchUserById = await AccountRepository.findOneBy({id});
 
             if(!searchUserById){
-                objectAlertEJS.internalServerError = true;
-                return res.render(forgotPasswordEJS, objectAlertEJS);
+                res.locals.alerts.internalServerError = true;
+                return res.render(forgotPasswordEJS, res.locals.alerts);
             }
             else{
-                objectAlertEJS.internalServerError = false;
+                res.locals.alerts.internalServerError = false;
             }
         }
         catch(error){
@@ -369,32 +324,23 @@ export class AccountController{
 
     async changeForgotPassword(req: Request, res: Response, next: NextFunction){
 
-        let objectAlertEJS: any = {
-            invalidData: undefined,
-            differentPasswords: undefined,
-            internalServerError: undefined,
-            successChangeForgotPassword: undefined,
-            invalidToken: undefined,
-            passwordAlreadyChanged: undefined
-        };
-
         const { JWT } = req.params
         const { newPassword, confirmNewPassword } = req.body;
 
         if(!newPassword || !confirmNewPassword){
-            objectAlertEJS.invalidData = true;
-            return res.render(changeForgotPasswordEJS, objectAlertEJS);
+            res.locals.alerts.invalidData = true;
+            return res.render(changeForgotPasswordEJS, res.locals.alerts);
         }
         else{
-            objectAlertEJS.invalidData = false;
+            res.locals.alerts.invalidData = false;
         }
 
         if(newPassword !== confirmNewPassword){
-            objectAlertEJS.differentPasswords = true;
-            return res.render(changeForgotPasswordEJS, objectAlertEJS);
+            res.locals.alerts.differentPasswords = true;
+            return res.render(changeForgotPasswordEJS, res.locals.alerts);
         }
         else{
-            objectAlertEJS.differentPasswords = false;
+            res.locals.alerts.differentPasswords = false;
         }
 
         try{
@@ -406,12 +352,12 @@ export class AccountController{
             const searchUserByEmail = await AccountRepository.findOneBy({email})
 
             if(!searchUserByEmail){
-                objectAlertEJS.internalServerError = true;
-                return res.render(changeForgotPasswordEJS, objectAlertEJS);
+                res.locals.alerts.internalServerError = true;
+                return res.render(changeForgotPasswordEJS, res.locals.alerts);
             }
 
             else{
-                objectAlertEJS.internalServerError = false;
+                res.locals.alerts.internalServerError = false;
             }
 
                 // O Token de Reset Password TEM que tem 15 Minutos de Expiração, então o Código abaixo EVITA ISSO !! >>
@@ -465,11 +411,11 @@ export class AccountController{
         catch(error){
             console.log(error);
 
-            objectAlertEJS.invalidToken = true;
-            return res.render(changeForgotPasswordEJS, objectAlertEJS)
+            res.locals.alerts.invalidToken = true;
+            return res.render(changeForgotPasswordEJS, res.locals.alerts)
         }
 
-        objectAlertEJS.invalidToken = false;
+        res.locals.alerts.invalidToken = false;
 
         next();
 

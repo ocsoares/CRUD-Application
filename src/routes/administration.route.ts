@@ -24,20 +24,8 @@ const __dirname = path.resolve();
 
 const administrationRouteHTML = path.join(__dirname, '/src/views/admin-panel.ejs');
 
-const objectAlertEJS = {
-    invalidData: undefined,
-    userExists: undefined,
-    emailExists: undefined,
-    invalidEmail: undefined,
-    successRegister: undefined,
-    differentPasswords: undefined,
-    internalServerError: undefined,
-    errorLogin: undefined,
-    successLogin: undefined
-};
-
 administrationRoute.get('/admin', new VerificationAccount().blockAdminPageIfLogged, (req: Request, res: Response) => {
-    res.render(administrationRouteHTML, objectAlertEJS);
+    res.render(administrationRouteHTML, res.locals.alerts);
 })
 
 administrationRoute.post('/admin', new AccountController().adminPanelLogin, (req: Request, res: Response) => {
