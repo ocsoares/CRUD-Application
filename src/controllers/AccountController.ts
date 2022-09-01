@@ -131,11 +131,12 @@ export class AccountController{
             const searchUserByEmail = await AccountRepository.findOneBy({email: loginEmail})
 
             if(!searchUserByEmail){
-                // objectAlertEJS.errorLogin = true;
-                // res.locals.alerts.errorLogin = true;
-                // return res.render(registerLoginRouteHTML, res.locals.alerts);
-                req.flash
-                return res.redirect('/account');
+                // req.flash('teste', 'testeum fi kkkkkkkk');
+                // req.flash('testedois', 'f');
+                // console.log('FLASH:', req.flash('teste', 'testeum fi kkkkkkkk'));
+                // return res.redirect('/account');
+                res.locals.alerts.errorLogin = true;
+                return res.render(registerLoginRouteHTML, res.locals.alerts);
             }
 
             const verifyPassword = await bcrypt.compare(loginPassword, searchUserByEmail.password);
@@ -153,7 +154,7 @@ export class AccountController{
                 expiresIn: '12h',
             });
 
-            res.cookie('session_app', JWTCookie, {
+            res.cookie('session_auth', JWTCookie, {
                 httpOnly: true
             })
 
@@ -230,7 +231,7 @@ export class AccountController{
             expiresIn: '12h'
         })
 
-        res.cookie('session_admin', JWTCookie, {
+        res.cookie('session_authadmin', JWTCookie, {
             httpOnly: true
         })
 
@@ -308,14 +309,20 @@ export class AccountController{
             const searchUserById = await AccountRepository.findOneBy({id});
 
             if(!searchUserById){
-                res.locals.alerts.internalServerError = true;
-                return res.render(forgotPasswordEJS, res.locals.alerts);
+                // res.locals.alerts.internalServerError = true;
+                // return res.render(forgotPasswordEJS, res.locals.alerts);
+                console.log('CAIU NO ID');
+                req.flash('teste', 'ID INVÁLIDO');
+                return res.redirect('/forgotpassword');
             }
-            else{
-                res.locals.alerts.internalServerError = false;
-            }
+            // else{
+            //     res.locals.alerts.internalServerError = false;
+            // }
         }
         catch(error){
+            req.flash('teste', 'testeum fi kkkkkkkk');
+            req.flash('testedois', 'f');
+            console.log('FLASH:', req.flash('teste'));
             return res.redirect('/forgotpassword');
         }
 

@@ -31,15 +31,23 @@ AppDataSource.initialize().then(() => {
         keys: [process.env.COOKIE_SECRET as string],
         sameSite: 'strict',
         secure: process.env.COOKIE_SECRET === 'production' ? true : false,
-        httpOnly: true
+        httpOnly: true,
     }));
 
     server.use(connectFlash());
 
+    server.use(bodyParser.urlencoded({ extended: true }));
+    server.use(bodyParser.json());
+    server.use(bodyParser.text({ type: 'text/json' }));
+
+    server.use(cors());
+    server.use(express.static(__dirname + '/src/views'));
+    server.use(express.static(__dirname + '/src/public'));
+    server.use(express.static(__dirname + '/dist'));
+
         // Middleware de Alertas para usar em QUALQUER Rota !! <<
     server.use((req: Request, res: Response, next: NextFunction) => {
         res.locals.alerts = {
-        teste: req.flash(), // Colocar o NOME do req.flash("nome") Aqui como UNDEFINED, e no Controller DEFINIR o Nome !! <<
         invalidData: undefined,
         userExists: undefined,
         emailExists: undefined,
@@ -60,14 +68,37 @@ AppDataSource.initialize().then(() => {
         next();
     })
 
-    server.use(bodyParser.urlencoded({ extended: true }));
-    server.use(bodyParser.json());
-    server.use(bodyParser.text({ type: 'text/json' }));
+    const apenastesteEJS = path.join(__dirname, '/src/views/apenasteste.ejs');
 
-    server.use(cors());
-    server.use(express.static(__dirname + '/src/views'));
-    server.use(express.static(__dirname + '/src/public'));
-    server.use(express.static(__dirname + '/dist'));
+    server.use((req: Request, res: Response, next: NextFunction) => {
+        res.locals.teste = req.flash('teste');
+        res.locals.testedois = req.flash("testedois");
+        next();
+      });
+
+    server.get('/teste', (req: Request, res: Response) => {
+                // FUNCIONO ! 
+        // req.flash('teste', 'arrozpreto');
+        // res.redirect('/testemsg');
+
+        let arroz = 3
+        if(arroz === 3){
+            req.flash('teste', 'testeum fi kkkkkkkk');
+            res.redirect('/testemsg');
+        }
+
+        else{
+            req.flash('testedois', 'testedois PORRAA KKK')
+            res.redirect('/testemsg');
+        }
+    })
+
+    server.get('/testemsg', (req: Request, res: Response) => {
+            // FUNCIONO !! 
+        // res.send(req.flash('teste'))
+
+        res.render(apenastesteEJS);
+    })
 
     server.use(registerLoginRoute);
     server.use(dashboardRoute);

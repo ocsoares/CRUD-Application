@@ -3,7 +3,6 @@ import { Request, Response, Router } from "express";
 import { AccountController } from '../controllers/AccountController'
 import { VerificationAccount } from "../controllers/VerificationsAccount";
 import cookieParser from "cookie-parser";
-import session from 'cookie-session'
 import { sendNodemailerToResetPass } from "../scripts/nodemailer.script";
 
 const registerLoginRoute = Router();
@@ -48,7 +47,6 @@ const forgotPasswordEJS = path.join(__dirname, '/src/views/forgotpassword.ejs');
 const changeForgotPasswordEJS = path.join(__dirname, '/src/views/changeforgotpassword.ejs');
 
 registerLoginRoute.get('/account', new VerificationAccount().blockRegisterLoginPageIfLogged, (req: Request, res: Response) => {
-    console.log('TESTE NA ROTA:', res.locals.alerts);
     res.render(registerLoginRouteEJS, res.locals.alerts);
                                 //, {teste: 'FODASE KKK'} << Exemplo q pode ser usado no .ejs !! <<
 })

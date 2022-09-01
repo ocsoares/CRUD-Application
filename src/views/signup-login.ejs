@@ -18,9 +18,25 @@
   
 <body>
 
-  <% if(teste){ %>
-    <h1>FODASEEEEEEEEE</h1>
-    <% } %>
+  <% if(teste != '') { %> <!-- APENAS UM =     !!! <<  -->
+    <div class="alert alert-danger text-center" role="alert">
+        <strong>Error:</strong>
+        <%- teste %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+ <% } %>
+
+ <% if(testedois != '') { %> <!-- APENAS UM =     !!! <<  -->
+  <div class="alert alert-danger text-center" role="alert">
+      <strong>Error:</strong>
+      <%- testedois %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+<% } %>
     
     <% if(invalidData === true) { %>
     <div class="alert alert-danger text-center" role="alert">
