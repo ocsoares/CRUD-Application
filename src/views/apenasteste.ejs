@@ -11,24 +11,15 @@
 <body>
     <h1>PAGINA FUNFANDO</h1>
 
-    <% if(teste != '') { %> <!-- APENAS UM =     !!! <<  -->
-        <div class="alert alert-danger text-center" role="alert">
-            <strong>Error:</strong>
-            <%- teste %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-     <% } %>
-
-     <% if(testedois != '') { %> 
-        <div class="alert alert-success text-center" role="alert">
-            <%- testedois %>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-     <% } %>
+    <% if(passwordAlreadyChangedFlash != '') { %> <!-- APENAS UM =     !!! <<  -->
+      <div class="alert alert-danger text-center" role="alert">
+          <strong>Error:</strong>
+          <%- passwordAlreadyChangedFlash %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+    <% } %>
 
      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>

@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import express, { NextFunction, Request, Response } from 'express'
 import path from 'path'
-import { AppDataSource } from './database'
+import { AppDataSource } from './config/database'
 import registerLoginRoute from './routes/register-login.route'
 import administrationRoute from './routes/administration.route'
 import dashboardRoute from './routes/dashboard.route'
@@ -12,6 +12,14 @@ import bodyParser from 'body-parser';
 import connectFlash from 'connect-flash'
 
 // Alterei o includes em tsconfig.json de "src/*.ts" para apenas "src/" Porque NÃO estava Transpilando ALGUNS arquivos de .ts para .js no dist !! <<
+
+// Instruções para o connect-flash:
+// Fazer um Middleware no Código Principal com as Mensagens a serem usadas (NÃO esquecer do next) com req.locals.nome = req.flash('nome');
+// >IMPORTANTE<: Não esquecer de colocar o Código EJS no EJS da Página a ser RENDERIZADA ou REDIRECIONADA !! <<
+// Usar no EJS <% if(NOME != '') { %>... (APENAS !=) !! <<
+// Para as Mensagens FLASH no EJS, usar <%- NOME %> com - no Começo !! <<
+// EVITAR usar console.log com as Mensagens FLASH, porque BUGA !! <<
+// NÃO usar Nome de Variável JÁ EXISTENTE (mesmo se NÃO estiver usando) para Mensagens FLASH, porque BUGA !!
 
 AppDataSource.initialize().then(() => {
     const server = express();
@@ -68,11 +76,15 @@ AppDataSource.initialize().then(() => {
         next();
     })
 
-    const apenastesteEJS = path.join(__dirname, '/src/views/apenasteste.ejs');
+    const apenastesteEJS = path.join(__dirname, '/src/views/apenasteste.ejs')
 
     server.use((req: Request, res: Response, next: NextFunction) => {
-        res.locals.teste = req.flash('teste');
-        res.locals.testedois = req.flash("testedois");
+        res.locals.invalidTokenFlash = req.flash('invalidTokenFlash');
+        res.locals.internalServerErrorFlash = req.flash("internalServerErrorFlash");
+        res.locals.passwordAlreadyChangedFlash = req.flash('passwordAlreadyChangedFlash'); 
+        res.locals.successChangeForgotPasswordFlash = req.flash('successChangeForgotPasswordFlash');
+        res.locals.permissionDeniedFlash = req.flash('permissionDeniedFlash');
+        res.locals.successLogoutFlash = req.flash('successLogoutFlash');
         next();
       });
 
@@ -83,7 +95,7 @@ AppDataSource.initialize().then(() => {
 
         let arroz = 3
         if(arroz === 3){
-            req.flash('teste', 'testeum fi kkkkkkkk');
+            req.flash('passwordAlreadyChangedFlash', 'TESTEEEEEEEEEEEEEEEEEEE'); 
             res.redirect('/testemsg');
         }
 

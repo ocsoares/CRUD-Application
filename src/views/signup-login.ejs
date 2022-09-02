@@ -18,25 +18,43 @@
   
 <body>
 
-  <% if(teste != '') { %> <!-- APENAS UM =     !!! <<  -->
+  <% if(invalidTokenFlash != '') { %> <!-- APENAS UM =     !!! <<  -->
     <div class="alert alert-danger text-center" role="alert">
         <strong>Error:</strong>
-        <%- teste %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
+        <%- invalidTokenFlash %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
  <% } %>
 
- <% if(testedois != '') { %> <!-- APENAS UM =     !!! <<  -->
+ <% if(internalServerErrorFlash != '') { %> <!-- APENAS UM =     !!! <<  -->
   <div class="alert alert-danger text-center" role="alert">
       <strong>Error:</strong>
-      <%- testedois %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
+      <%- internalServerErrorFlash %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
 <% } %>
+
+  <% if(successChangeForgotPasswordFlash != '') { %>
+    <div class="alert alert-success text-center" role="alert">
+        <%- successChangeForgotPasswordFlash %>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    <% } %>
+
+    <% if(successLogoutFlash != '') { %>
+      <div class="alert alert-success text-center" role="alert">
+          <%- successLogoutFlash %>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      <% } %>
     
     <% if(invalidData === true) { %>
     <div class="alert alert-danger text-center" role="alert">

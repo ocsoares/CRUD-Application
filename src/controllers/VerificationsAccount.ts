@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from 'jsonwebtoken' 
 import path from "path";
+import { redisClient } from "../config/redisConfig";
 import { AccountRepository } from "../repositories/AccountRepository";
 
 const __dirname = path.resolve();
@@ -18,8 +19,7 @@ const administrationRouteHTML = path.join(__dirname, '/src/views/admin-panel.ejs
 
 // POR ALGUM MOTIVO, o req.flash só está pegando em /account !! <<<<<
 export class VerificationAccount{
-    async checkIfUserAreLogged(req: Request, res: Response, next: NextFunction){ // Verificar se é user ou admin !!
-
+    async checkIfUserAreLogged(req: Request, res: Response, next: NextFunction){
             // Valores dos Cookies !! <<
         const { session_auth } = req.cookies
         const { session_authadmin } = req.cookies
@@ -31,40 +31,48 @@ export class VerificationAccount{
         const sessionAuthAdminNameIndex = Object.keys(req.cookies).indexOf('session_authadmin');
         const sessionAuthAdminName = Object.keys(req.cookies)[sessionAuthAdminNameIndex];
 
-            // Permitir o session_authadmin TAMBÉM porque também é um Usuário !! <<
-        if(sessionAuthName !== 'session_auth' && sessionAuthAdminName !== 'session_authadmin'){
-            console.log(sessionAuthName);
-            return res.redirect('/account');
-        }
-
             // NÃO é permitido os Dois Cookies estarem Ativos ao MESMO TEMPO, se estiverem, LIMPAR !! <<
         if(sessionAuthName && sessionAuthAdminName){
             res.clearCookie(sessionAuthName);
             res.clearCookie(sessionAuthAdminName);
+
+            req.flash('invalidTokenFlash', 'Formato do Token inválido !');
             return res.redirect('/account');
         }
 
         try{
-            if(session_auth){
-                const verifyJWT = jwt.verify(session_auth, "" + process.env.JWT_HASH);
+                const verifyJWT = jwt.verify(session_auth || session_authadmin, "" + process.env.JWT_HASH);
 
-                if(verifyJWT){
-                    return next();
-                }
-            }
-            
-            if(session_authadmin){
-                const verifyJWT = jwt.verify(session_authadmin, "" + process.env.JWT_HASH);
+                const checkJWTBlacklist = await redisClient.get(`blackListJWT_${session_auth || session_authadmin}`);
+                console.log('CHECK BLACKLIST:', checkJWTBlacklist);
 
-                if(verifyJWT){
-                    return next();
+                if(checkJWTBlacklist){
+                    console.log('EXISTE !!');
+                    res.clearCookie(sessionAuthName || sessionAuthAdminName);
+
+                    req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+                    return res.redirect('/account');
                 }
+
+                // >>Coloquei aqui embaixo porque estava mostrando o Alerta ANTES !! <<
+            // Permitir o session_authadmin TAMBÉM porque também é um Usuário !! <<
+            if (sessionAuthName !== 'session_auth' && sessionAuthAdminName !== 'session_authadmin') {
+                req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+                return res.redirect('/account');
             }
+
+            if (verifyJWT) {
+                req.JWTLogged = verifyJWT;
+                req.JWTCodeLogged = session_auth || session_authadmin;
+                return next();
+            }
+
         }
         catch(error){
-            console.log(error);
             res.clearCookie(sessionAuthName);
             res.clearCookie(sessionAuthAdminName);
+            
+            req.flash('invalidTokenFlash', 'É preciso estar autenticado para acessar essa rota !');
             return res.redirect('/account');
         }
 
@@ -78,36 +86,43 @@ export class VerificationAccount{
 
         const { session_authadmin } = req.cookies
 
-        if(sessionAuthAdminName !== 'session_authadmin'){
-            res.clearCookie(sessionAuthAdminName);
-            return res.redirect('/admin');
-        }
-
         try{
             const verifyJWT = jwt.verify(session_authadmin, "" + process.env.JWT_HASH);
+
+            const checkJWTBlacklist = await redisClient.get(`blackListJWT_${session_authadmin}`);
+                console.log('CHECK BLACKLIST:', checkJWTBlacklist);
+
+                if(checkJWTBlacklist){
+                    console.log('EXISTE !!');
+                    res.clearCookie(sessionAuthAdminName);
+
+                    req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+                    return res.redirect('/admin');
+                }
+
+            if(sessionAuthAdminName !== 'session_authadmin'){
+                res.clearCookie(sessionAuthAdminName);
+    
+                req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+                return res.redirect('/admin');
+            }
 
             const { id } = verifyJWT as any
 
             if(!id){
-                res.locals.alerts.internalServerError = true;
                 res.clearCookie(sessionAuthAdminName);
-                return res.render(administrationRouteHTML, res.locals.alerts);
-            }
 
-            else{
-                res.locals.alerts.internalServerError = false;
+                req.flash('internalServerErrorFlash', 'Não foi possível consultar o ID !');
+                return res.redirect('/admin');
             }
 
             const searchUserById = await AccountRepository.findOneBy({id})
 
             if(searchUserById?.type !== 'admin'){
                 res.clearCookie(sessionAuthAdminName);
-                res.locals.alerts.internalServerError = true;
-                return res.redirect('/admin');
-            }
 
-            else{
-                res.locals.alerts.internalServerError = false;
+                req.flash('permissionDeniedFlash', 'Apenas administradores podem acessar !');
+                return res.redirect('/admin');
             }
 
             if(verifyJWT){
@@ -116,7 +131,9 @@ export class VerificationAccount{
         }
         catch(error){
             res.clearCookie(sessionAuthAdminName);
-            res.redirect('/admin');
+
+            req.flash('invalidTokenFlash', 'É preciso estar autenticado para acessar essa rota !');
+            return res.redirect('/admin');
         }
 
         next(); 
@@ -133,6 +150,7 @@ export class VerificationAccount{
         const sessionAuthAdminName = Object.keys(req.cookies)[sessionAuthAdminNameIndex];
 
         if(sessionAuthName !== 'session_auth' && sessionAuthAdminName !== 'session_authadmin'){
+            // req.flash('invalidTokenFlash', 'Formato do Token inválido !');
             return next(); // Como a Próxima Página que esse Middlewara tá é /account, então NÃO precisa Redirecionar !! <<
         }
 
@@ -154,9 +172,10 @@ export class VerificationAccount{
             }
         }
         catch(error){
-            console.log(error);
             res.clearCookie(sessionAuthName);
             res.clearCookie(sessionAuthAdminName);
+
+            req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
             return next(); // Como a Próxima Página que esse Middlewara tá é /account, então NÃO precisa Redirecionar !! <<
         }
 
@@ -170,6 +189,8 @@ export class VerificationAccount{
 
         if(sessionAuthAdminName !== 'session_authadmin'){
             res.clearCookie(sessionAuthAdminName);
+
+            // req.flash('invalidTokenFlash', 'Formato do Token inválido !');
             return next();
         }
 
@@ -182,7 +203,9 @@ export class VerificationAccount{
         }
         catch(error){
             res.clearCookie(sessionAuthAdminName);
-            next();
+
+            req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+            return next();
         }
     }
 }

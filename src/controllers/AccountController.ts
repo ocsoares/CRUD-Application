@@ -4,6 +4,7 @@ import path from "path";
 import bcrypt from 'bcrypt'
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { ResetPasswordsRepository } from "../repositories/ResetPasswordsRepository";
+import { redisClient } from "../config/redisConfig";
 
 const __dirname = path.resolve();
 
@@ -12,27 +13,15 @@ const administrationRouteHTML = path.join(__dirname, '/src/views/admin-panel.ejs
 const forgotPasswordEJS = path.join(__dirname, '/src/views/forgotpassword.ejs');
 const changeForgotPasswordEJS = path.join(__dirname, '/src/views/changeforgotpassword.ejs');
 
-// PROCURAR UMA Layout Form para ADMIN e fazer uma Rota para Login de Admin's !! <<<
 //  OBS: Os admins vão ser setados Diretamente no Banco de Dados, Alterando o type (acho....) !! <<
 // >> Nessa lógica, todos os Usuários Registrado AQUI NÃO serão admin's !! <<
 // Query Command: UPDATE accounts SET type = 'admin' WHERE id = ...
 
-// Fazer um Sistema de ALTERA a Senha !! <<
-
-    // Para funcionar aqui no Controller, tenho que colocar esse Objeto AQUI e nas Rotas !! <<
-    //  OBS: Também tenho que passar esse Objeto no .render !! <<
-
-// Adicionar no Banco de Dados A DATA que a Conta foi criada !! <<
-
 // Colocar Tamanho MÍNIMO para Usuários e Senhas !! <<
-
-// Bloquear um Email de Alterar a Senha SE JÁ Bloqueou Recentemente !! <<
 
 // Fazer uma Pequena LOGO de Home para voltar a Página de Login/Register !! <<
 
-// CACHEAR com Redis o JWT usado no Logout e no RESET da Senha !! <<
-
-// Aprender o Connect-flash e Usar nas Rotas que NÃO da para mandar Mensagem depois de Redirecionado  (ex. Reset Pass) !! <<
+// Arrumar as Flash Messages, deixar apenas Mensagem de ERRO e SUCESSO, NÃO precisa mais que isso, porque pode se Escrever nelas... !! <<
 
 export class AccountController{
     async registerOrLoginAccount(req: Request, res: Response, next: NextFunction){
@@ -173,6 +162,30 @@ export class AccountController{
         }
 
     }
+
+    async logoutAccount(req: Request, res: Response, next: NextFunction){
+
+        const sessionAuthNameIndex = Object.keys(req.cookies).indexOf('session_auth');
+        const sessionAuthName = Object.keys(req.cookies)[sessionAuthNameIndex]
+
+        const sessionAuthAdminNameIndex = Object.keys(req.cookies).indexOf('session_authadmin');
+        const sessionAuthAdminName = Object.keys(req.cookies)[sessionAuthAdminNameIndex];
+
+        const JWTCode = req.JWTCodeLogged;
+        const JWTPayload = req.JWTLogged;
+
+        const redisBlackListExpire = 13 * 3600; // 13 Horas !
+
+        await redisClient.set(`blackListJWT_${JWTCode}`, JWTCode, 'EX', redisBlackListExpire);
+        console.log(`${JWTCode} cacheado com sucesso !`);
+
+        res.clearCookie(sessionAuthName);
+        res.clearCookie(sessionAuthAdminName);
+
+        req.flash('successLogoutFlash', 'Conta deslogada com sucesso. Até mais !');
+        return res.redirect('/account');
+        next();
+    }
     
     async adminPanelLogin(req: Request, res: Response, next: NextFunction){
 
@@ -304,25 +317,41 @@ export class AccountController{
         try{
             const verifyJWT = jwt.verify(JWT, "" + process.env.JWT_HASH) as JwtPayload;
 
-            const { id } = verifyJWT;
+            const { id, iat, exp } = verifyJWT;
+
+            // O Token de Reset Password TEM que ter 15 Minutos de Expiração, então o Código abaixo EVITA ISSO !! >>
+            if(iat && exp){ // If para EVITAR que seja Nulo !!
+                if((exp - iat) / 60 !== 15){
+                    req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+                    return res.redirect('/forgotpassword');
+                }
+            }
 
             const searchUserById = await AccountRepository.findOneBy({id});
 
+                // InternalServerError para quando o JWT for VÁLIDO, mas o ID NÃO existir no Banco de Dados !! <<
             if(!searchUserById){
-                // res.locals.alerts.internalServerError = true;
-                // return res.render(forgotPasswordEJS, res.locals.alerts);
-                console.log('CAIU NO ID');
-                req.flash('teste', 'ID INVÁLIDO');
+                req.flash('internalServerErrorFlash', 'Não foi possível consultar esse Usuário !');
                 return res.redirect('/forgotpassword');
             }
-            // else{
-            //     res.locals.alerts.internalServerError = false;
-            // }
+
+            const searchUserResetByEmail = await ResetPasswordsRepository.findOneBy({email: searchUserById.email});
+
+            const newDate = new Date();
+
+            // USAR PARA EVITAR QUE ATUALIZE A SENHA DENOVO NO MESMO TOKEN !! <<
+            const currentTime = newDate.setMinutes(newDate.getMinutes());
+
+            if(searchUserResetByEmail){
+                if(currentTime < searchUserResetByEmail.minuteToResetAgain){
+                    req.flash('passwordAlreadyChangedFlash', 'A senha já foi alterada recentemente !');
+                    return res.redirect('/forgotpassword');
+                }
+            }
+
         }
         catch(error){
-            req.flash('teste', 'testeum fi kkkkkkkk');
-            req.flash('testedois', 'f');
-            console.log('FLASH:', req.flash('teste'));
+            req.flash('invalidTokenFlash', 'Token inválido ou expirado !');            
             return res.redirect('/forgotpassword');
         }
 
@@ -351,7 +380,7 @@ export class AccountController{
         }
 
         try{
-            const verifyJWT = jwt.verify(JWT, "" + process.env.JWT_HASH) as JwtPayload;
+            const verifyJWT = jwt.verify(JWT, "" + process.env.JWT_HASH) as JwtPayload; // JWT usado nesse caso Apenas para as Verificações abaixo !! <<
             console.log('verifyJWT:', verifyJWT);
 
             const { id, email, iat, exp } = verifyJWT;
@@ -359,22 +388,16 @@ export class AccountController{
             const searchUserByEmail = await AccountRepository.findOneBy({email})
 
             if(!searchUserByEmail){
-                res.locals.alerts.internalServerError = true;
-                return res.render(changeForgotPasswordEJS, res.locals.alerts);
+                req.flash('internalServerErrorFlash', 'Não foi possível consultar esse email !');
+                return res.redirect('/forgotpassword');
             }
 
-            else{
-                res.locals.alerts.internalServerError = false;
-            }
-
+                    // ACHO que NÃO precisa disso porque vou por no checkJWT na URL !! <<
                 // O Token de Reset Password TEM que tem 15 Minutos de Expiração, então o Código abaixo EVITA ISSO !! >>
             if(iat && exp){
                 if((exp - iat) / 60 !== 15){
-                    console.log('JWT INCORRETO !');
+                    req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
                     return res.redirect('/forgotpassword');
-                }
-                else{
-                    console.log('JWT CORRETO !');
                 }
             }
 
@@ -391,9 +414,6 @@ export class AccountController{
             const newDate = new Date();
             const nextTimeToResetAgain = newDate.setMinutes(newDate.getMinutes() + 60);
 
-                // USAR PARA EVITAR QUE ATUALIZE A SENHA DENOVO NO MESMO TOKEN !! <<
-            const currentTime = newDate.setMinutes(newDate.getMinutes());
-
             const searchUserResetPassword = await ResetPasswordsRepository.findOneBy({email: email});
             console.log('PROCURE USERRESET:', searchUserResetPassword);
             
@@ -401,7 +421,7 @@ export class AccountController{
                 const createUserResetPassword = ResetPasswordsRepository.create({
                     email,
                     oldPassword: searchUserByEmail.password,
-                    resetOnDate: currentDayMonthYear,
+                    lastDateReset: currentDayMonthYear,
                     minuteToResetAgain: nextTimeToResetAgain
                 });
 
@@ -416,20 +436,13 @@ export class AccountController{
 
         }
         catch(error){
-            console.log(error);
-
-            res.locals.alerts.invalidToken = true;
-            return res.render(changeForgotPasswordEJS, res.locals.alerts)
+            req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+            return res.redirect('/forgotpassword');
         }
 
-        res.locals.alerts.invalidToken = false;
+        req.flash('successChangeForgotPasswordFlash', 'Senha alterada com sucesso !');
+        res.redirect('/account');
 
         next();
-
-            // TENTAR COLOCAR UM AVISO COM FLASH MESSAGE !! <<
-        // objectAlertEJS.successChangeForgotPassword = true;
-        // return res.render(changeForgotPasswordEJS, objectAlertEJS);
-
-        res.redirect('/account');
     }
 }

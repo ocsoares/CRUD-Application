@@ -13,7 +13,7 @@ export class ResetPasswords{
     oldPassword: string
 
     @Column({type: 'text', nullable: false})
-    resetOnDate: string
+    lastDateReset: string
 
     @Column({type: 'numeric', nullable: true})
     minuteToResetAgain: number

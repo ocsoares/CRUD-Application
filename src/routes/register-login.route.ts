@@ -56,7 +56,8 @@ registerLoginRoute.post('/account', new AccountController().registerOrLoginAccou
     console.log('SignedCookies kk:', req.signedCookies);
 })
 
-registerLoginRoute.get('/logout', new VerificationAccount().checkIfUserAreLogged, (req: Request, res: Response) => {
+registerLoginRoute.get('/logout', new VerificationAccount().checkIfUserAreLogged,
+new AccountController().logoutAccount, (req: Request, res: Response) => {
     res.json({message: 'Deslogado !'});
 })
 

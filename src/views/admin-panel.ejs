@@ -13,6 +13,36 @@
 
 <body>
 
+  <% if(invalidTokenFlash != '') { %> <!-- APENAS UM =     !!! <<  -->
+    <div class="alert alert-danger text-center" role="alert">
+        <strong>Error:</strong>
+        <%- invalidTokenFlash %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+ <% } %>
+
+ <% if(internalServerErrorFlash != '') { %> <!-- APENAS UM =     !!! <<  -->
+  <div class="alert alert-danger text-center" role="alert">
+      <strong>Error:</strong>
+      <%- internalServerErrorFlash %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+<% } %>
+
+<% if(permissionDeniedFlash != '') { %> <!-- APENAS UM =     !!! <<  -->
+  <div class="alert alert-danger text-center" role="alert">
+      <strong>Permissão negada:</strong>
+      <%- permissionDeniedFlash %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+<% } %>
+
     <% if(invalidData === true) { %>
         <div class="alert alert-danger text-center" role="alert">
             <strong>Error:</strong>
