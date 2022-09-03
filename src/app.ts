@@ -78,13 +78,10 @@ AppDataSource.initialize().then(() => {
 
     const apenastesteEJS = path.join(__dirname, '/src/views/apenasteste.ejs')
 
+        // Middleware de Flash Messages !! <<
     server.use((req: Request, res: Response, next: NextFunction) => {
-        res.locals.invalidTokenFlash = req.flash('invalidTokenFlash');
-        res.locals.internalServerErrorFlash = req.flash("internalServerErrorFlash");
-        res.locals.passwordAlreadyChangedFlash = req.flash('passwordAlreadyChangedFlash'); 
-        res.locals.successChangeForgotPasswordFlash = req.flash('successChangeForgotPasswordFlash');
-        res.locals.permissionDeniedFlash = req.flash('permissionDeniedFlash');
-        res.locals.successLogoutFlash = req.flash('successLogoutFlash');
+        res.locals.errorFlash = req.flash('errorFlash');
+        res.locals.successFlash = req.flash("successFlash");
         next();
       });
 
@@ -95,12 +92,12 @@ AppDataSource.initialize().then(() => {
 
         let arroz = 3
         if(arroz === 3){
-            req.flash('passwordAlreadyChangedFlash', 'TESTEEEEEEEEEEEEEEEEEEE'); 
+            req.flash('errorFlash', 'TESTEEEEEEEEEEEEEEEEEEE'); 
             res.redirect('/testemsg');
         }
 
         else{
-            req.flash('testedois', 'testedois PORRAA KKK')
+            req.flash('errorFlash', 'testedois PORRAA KKK')
             res.redirect('/testemsg');
         }
     })

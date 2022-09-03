@@ -120,9 +120,9 @@ export class AccountController{
             const searchUserByEmail = await AccountRepository.findOneBy({email: loginEmail})
 
             if(!searchUserByEmail){
-                // req.flash('teste', 'testeum fi kkkkkkkk');
-                // req.flash('testedois', 'f');
-                // console.log('FLASH:', req.flash('teste', 'testeum fi kkkkkkkk'));
+                // req.flash('errorFlash', 'testeum fi kkkkkkkk');
+                // req.flash('errorFlash', 'f');
+                // console.log('FLASH:', req.flash('errorFlash', 'testeum fi kkkkkkkk'));
                 // return res.redirect('/account');
                 res.locals.alerts.errorLogin = true;
                 return res.render(registerLoginRouteHTML, res.locals.alerts);
@@ -182,7 +182,7 @@ export class AccountController{
         res.clearCookie(sessionAuthName);
         res.clearCookie(sessionAuthAdminName);
 
-        req.flash('successLogoutFlash', 'Conta deslogada com sucesso. Até mais !');
+        req.flash('successFlash', 'Conta deslogada com sucesso. Até mais !');
         return res.redirect('/account');
         next();
     }
@@ -322,7 +322,7 @@ export class AccountController{
             // O Token de Reset Password TEM que ter 15 Minutos de Expiração, então o Código abaixo EVITA ISSO !! >>
             if(iat && exp){ // If para EVITAR que seja Nulo !!
                 if((exp - iat) / 60 !== 15){
-                    req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+                    req.flash('errorFlash', 'Token inválido ou expirado !');
                     return res.redirect('/forgotpassword');
                 }
             }
@@ -331,7 +331,7 @@ export class AccountController{
 
                 // InternalServerError para quando o JWT for VÁLIDO, mas o ID NÃO existir no Banco de Dados !! <<
             if(!searchUserById){
-                req.flash('internalServerErrorFlash', 'Não foi possível consultar esse Usuário !');
+                req.flash('errorFlash', 'Não foi possível consultar esse Usuário !');
                 return res.redirect('/forgotpassword');
             }
 
@@ -344,14 +344,14 @@ export class AccountController{
 
             if(searchUserResetByEmail){
                 if(currentTime < searchUserResetByEmail.minuteToResetAgain){
-                    req.flash('passwordAlreadyChangedFlash', 'A senha já foi alterada recentemente !');
+                    req.flash('errorFlash', 'A senha já foi alterada recentemente !');
                     return res.redirect('/forgotpassword');
                 }
             }
 
         }
         catch(error){
-            req.flash('invalidTokenFlash', 'Token inválido ou expirado !');            
+            req.flash('errorFlash', 'Token inválido ou expirado !');            
             return res.redirect('/forgotpassword');
         }
 
@@ -388,7 +388,7 @@ export class AccountController{
             const searchUserByEmail = await AccountRepository.findOneBy({email})
 
             if(!searchUserByEmail){
-                req.flash('internalServerErrorFlash', 'Não foi possível consultar esse email !');
+                req.flash('errorFlash', 'Não foi possível consultar esse email !');
                 return res.redirect('/forgotpassword');
             }
 
@@ -396,7 +396,7 @@ export class AccountController{
                 // O Token de Reset Password TEM que tem 15 Minutos de Expiração, então o Código abaixo EVITA ISSO !! >>
             if(iat && exp){
                 if((exp - iat) / 60 !== 15){
-                    req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+                    req.flash('errorFlash', 'Token inválido ou expirado !');
                     return res.redirect('/forgotpassword');
                 }
             }
@@ -436,11 +436,11 @@ export class AccountController{
 
         }
         catch(error){
-            req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+            req.flash('errorFlash', 'Token inválido ou expirado !');
             return res.redirect('/forgotpassword');
         }
 
-        req.flash('successChangeForgotPasswordFlash', 'Senha alterada com sucesso !');
+        req.flash('successFlash', 'Senha alterada com sucesso !');
         res.redirect('/account');
 
         next();

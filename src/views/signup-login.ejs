@@ -18,43 +18,24 @@
   
 <body>
 
-  <% if(invalidTokenFlash != '') { %> <!-- APENAS UM =     !!! <<  -->
+  <% if(errorFlash != '') { %> <!-- APENAS UM =     !!! <<  -->
     <div class="alert alert-danger text-center" role="alert">
         <strong>Error:</strong>
-        <%- invalidTokenFlash %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
+        <%- errorFlash %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
  <% } %>
 
- <% if(internalServerErrorFlash != '') { %> <!-- APENAS UM =     !!! <<  -->
-  <div class="alert alert-danger text-center" role="alert">
-      <strong>Error:</strong>
-      <%- internalServerErrorFlash %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
+ <% if(successFlash != '') { %>
+  <div class="alert alert-success text-center" role="alert">
+      <%- successFlash %>
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-<% } %>
-
-  <% if(successChangeForgotPasswordFlash != '') { %>
-    <div class="alert alert-success text-center" role="alert">
-        <%- successChangeForgotPasswordFlash %>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    <% } %>
-
-    <% if(successLogoutFlash != '') { %>
-      <div class="alert alert-success text-center" role="alert">
-          <%- successLogoutFlash %>
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-      <% } %>
+      </button>
+  </div>
+  <% } %>
     
     <% if(invalidData === true) { %>
     <div class="alert alert-danger text-center" role="alert">

@@ -1,0 +1,11 @@
+body{
+    background: #8394A1;
+}
+
+nav #logout{
+    font-size: 18px;
+}
+
+nav #adm{
+    margin-left: 550px;
+}

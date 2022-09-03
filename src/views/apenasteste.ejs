@@ -11,14 +11,23 @@
 <body>
     <h1>PAGINA FUNFANDO</h1>
 
-    <% if(passwordAlreadyChangedFlash != '') { %> <!-- APENAS UM =     !!! <<  -->
+    <% if(errorFlash != '') { %> <!-- APENAS UM =     !!! <<  -->
       <div class="alert alert-danger text-center" role="alert">
           <strong>Error:</strong>
-          <%- passwordAlreadyChangedFlash %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
+          <%- errorFlash %> <!-- USAR < %- % > (JUNTO óbvio) para Imprimir a STRING Digitada !! << -->
           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
+   <% } %>
+
+   <% if(successFlash != '') { %>
+    <div class="alert alert-success text-center" role="alert">
+        <%- successFlash %>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     <% } %>
 
      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

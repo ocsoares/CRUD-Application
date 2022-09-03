@@ -20,6 +20,10 @@ const administrationRouteHTML = path.join(__dirname, '/src/views/admin-panel.ejs
 // POR ALGUM MOTIVO, o req.flash só está pegando em /account !! <<<<<
 export class VerificationAccount{
     async checkIfUserAreLogged(req: Request, res: Response, next: NextFunction){
+
+        const teste = await AccountRepository.query('SELECT username FROM accounts');
+        console.log(teste);
+
             // Valores dos Cookies !! <<
         const { session_auth } = req.cookies
         const { session_authadmin } = req.cookies
@@ -36,7 +40,7 @@ export class VerificationAccount{
             res.clearCookie(sessionAuthName);
             res.clearCookie(sessionAuthAdminName);
 
-            req.flash('invalidTokenFlash', 'Formato do Token inválido !');
+            req.flash('errorFlash', 'Formato do Token inválido !');
             return res.redirect('/account');
         }
 
@@ -50,14 +54,14 @@ export class VerificationAccount{
                     console.log('EXISTE !!');
                     res.clearCookie(sessionAuthName || sessionAuthAdminName);
 
-                    req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+                    req.flash('errorFlash', 'Token inválido ou expirado !');
                     return res.redirect('/account');
                 }
 
                 // >>Coloquei aqui embaixo porque estava mostrando o Alerta ANTES !! <<
             // Permitir o session_authadmin TAMBÉM porque também é um Usuário !! <<
             if (sessionAuthName !== 'session_auth' && sessionAuthAdminName !== 'session_authadmin') {
-                req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+                req.flash('errorFlash', 'Token inválido ou expirado !');
                 return res.redirect('/account');
             }
 
@@ -72,7 +76,7 @@ export class VerificationAccount{
             res.clearCookie(sessionAuthName);
             res.clearCookie(sessionAuthAdminName);
             
-            req.flash('invalidTokenFlash', 'É preciso estar autenticado para acessar essa rota !');
+            req.flash('errorFlash', 'É preciso estar autenticado para acessar essa rota !');
             return res.redirect('/account');
         }
 
@@ -96,14 +100,14 @@ export class VerificationAccount{
                     console.log('EXISTE !!');
                     res.clearCookie(sessionAuthAdminName);
 
-                    req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+                    req.flash('errorFlash', 'Token inválido ou expirado !');
                     return res.redirect('/admin');
                 }
 
             if(sessionAuthAdminName !== 'session_authadmin'){
                 res.clearCookie(sessionAuthAdminName);
     
-                req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+                req.flash('errorFlash', 'Token inválido ou expirado !');
                 return res.redirect('/admin');
             }
 
@@ -112,7 +116,7 @@ export class VerificationAccount{
             if(!id){
                 res.clearCookie(sessionAuthAdminName);
 
-                req.flash('internalServerErrorFlash', 'Não foi possível consultar o ID !');
+                req.flash('errorFlash', 'Não foi possível consultar o ID !');
                 return res.redirect('/admin');
             }
 
@@ -121,7 +125,7 @@ export class VerificationAccount{
             if(searchUserById?.type !== 'admin'){
                 res.clearCookie(sessionAuthAdminName);
 
-                req.flash('permissionDeniedFlash', 'Apenas administradores podem acessar !');
+                req.flash('errorFlash', 'Apenas administradores podem acessar !');
                 return res.redirect('/admin');
             }
 
@@ -132,7 +136,7 @@ export class VerificationAccount{
         catch(error){
             res.clearCookie(sessionAuthAdminName);
 
-            req.flash('invalidTokenFlash', 'É preciso estar autenticado para acessar essa rota !');
+            req.flash('errorFlash', 'É preciso estar autenticado para acessar essa rota !');
             return res.redirect('/admin');
         }
 
@@ -150,7 +154,7 @@ export class VerificationAccount{
         const sessionAuthAdminName = Object.keys(req.cookies)[sessionAuthAdminNameIndex];
 
         if(sessionAuthName !== 'session_auth' && sessionAuthAdminName !== 'session_authadmin'){
-            // req.flash('invalidTokenFlash', 'Formato do Token inválido !');
+            // req.flash('errorFlash', 'Formato do Token inválido !');
             return next(); // Como a Próxima Página que esse Middlewara tá é /account, então NÃO precisa Redirecionar !! <<
         }
 
@@ -175,7 +179,7 @@ export class VerificationAccount{
             res.clearCookie(sessionAuthName);
             res.clearCookie(sessionAuthAdminName);
 
-            req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+            req.flash('errorFlash', 'Token inválido ou expirado !');
             return next(); // Como a Próxima Página que esse Middlewara tá é /account, então NÃO precisa Redirecionar !! <<
         }
 
@@ -190,7 +194,7 @@ export class VerificationAccount{
         if(sessionAuthAdminName !== 'session_authadmin'){
             res.clearCookie(sessionAuthAdminName);
 
-            // req.flash('invalidTokenFlash', 'Formato do Token inválido !');
+            // req.flash('errorFlash', 'Formato do Token inválido !');
             return next();
         }
 
@@ -204,7 +208,7 @@ export class VerificationAccount{
         catch(error){
             res.clearCookie(sessionAuthAdminName);
 
-            req.flash('invalidTokenFlash', 'Token inválido ou expirado !');
+            req.flash('errorFlash', 'Token inválido ou expirado !');
             return next();
         }
     }
