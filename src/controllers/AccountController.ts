@@ -21,7 +21,7 @@ const changeForgotPasswordEJS = path.join(__dirname, '/src/views/changeforgotpas
 
 // Fazer uma Pequena LOGO de Home para voltar a Página de Login/Register !! <<
 
-// Arrumar as Flash Messages, deixar apenas Mensagem de ERRO e SUCESSO, NÃO precisa mais que isso, porque pode se Escrever nelas... !! <<
+// Quando colocar para Deploy, deixar PÚBLICO uma Conta ADMIN (com email/senha) !! <<
 
 export class AccountController{
     async registerOrLoginAccount(req: Request, res: Response, next: NextFunction){
@@ -104,7 +104,7 @@ export class AccountController{
                 username: registerUsername,
                 email: registerEmail,
                 password: encryptPassword,
-                createdDate
+                created_date: createdDate
             })
 
             await AccountRepository.save(saveNewAccount);            
@@ -283,7 +283,7 @@ export class AccountController{
         const searchUserResetPassword = await ResetPasswordsRepository.findOneBy({email: searchUserByEmail?.email});
 
         if(searchUserResetPassword){
-            if(currentTime < searchUserResetPassword?.minuteToResetAgain){
+            if(currentTime < searchUserResetPassword?.minute_to_reset_again){
                 res.locals.alerts.passwordAlreadyChanged = true;
                 return res.render(forgotPasswordEJS, res.locals.alerts);
             }
@@ -343,7 +343,7 @@ export class AccountController{
             const currentTime = newDate.setMinutes(newDate.getMinutes());
 
             if(searchUserResetByEmail){
-                if(currentTime < searchUserResetByEmail.minuteToResetAgain){
+                if(currentTime < searchUserResetByEmail.minute_to_reset_again){
                     req.flash('errorFlash', 'A senha já foi alterada recentemente !');
                     return res.redirect('/forgotpassword');
                 }
@@ -402,8 +402,6 @@ export class AccountController{
             }
 
             const encryptPassword = await bcrypt.hash(newPassword, 10) as any;
-            console.log('newPassword:', newPassword);
-            console.log('ENCRYPT:', encryptPassword);
 
             await AccountRepository.update(id, {
                 password: encryptPassword
@@ -420,9 +418,9 @@ export class AccountController{
             if(!searchUserResetPassword){
                 const createUserResetPassword = ResetPasswordsRepository.create({
                     email,
-                    oldPassword: searchUserByEmail.password,
-                    lastDateReset: currentDayMonthYear,
-                    minuteToResetAgain: nextTimeToResetAgain
+                    old_password: searchUserByEmail.password,
+                    last_date_reset: currentDayMonthYear,
+                    minute_to_reset_again: nextTimeToResetAgain
                 });
 
                 await ResetPasswordsRepository.save(createUserResetPassword);
@@ -430,7 +428,7 @@ export class AccountController{
 
             else{
                 await ResetPasswordsRepository.update(searchUserResetPassword.id, {
-                    minuteToResetAgain: nextTimeToResetAgain
+                    minute_to_reset_again: nextTimeToResetAgain
                 });
             }
 

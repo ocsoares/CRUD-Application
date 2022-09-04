@@ -94,7 +94,6 @@ export class VerificationAccount{
             const verifyJWT = jwt.verify(session_authadmin, "" + process.env.JWT_HASH);
 
             const checkJWTBlacklist = await redisClient.get(`blackListJWT_${session_authadmin}`);
-                console.log('CHECK BLACKLIST:', checkJWTBlacklist);
 
                 if(checkJWTBlacklist){
                     console.log('EXISTE !!');

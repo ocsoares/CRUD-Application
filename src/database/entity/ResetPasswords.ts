@@ -10,12 +10,12 @@ export class ResetPasswords{
     email: string
 
     @Column({type: 'text', nullable: false})
-    oldPassword: string
+    old_password: string
 
     @Column({type: 'text', nullable: false})
-    lastDateReset: string
+    last_date_reset: string
 
     @Column({type: 'numeric', nullable: true})
-    minuteToResetAgain: number
+    minute_to_reset_again: number
 
 }

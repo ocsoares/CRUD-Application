@@ -9,3 +9,11 @@ nav #logout{
 nav #adm{
     margin-left: 550px;
 }
+
+.create-new-user-body{
+    background-color: #8394A1;
+}
+
+#create-user-background{
+    background-color: #343a46;
+}

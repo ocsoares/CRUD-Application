@@ -8,8 +8,8 @@
     "start": "node ./dist/app.js",
     "build": "tsc",
     "nodemon": "nodemon ./dist/app.js",
-    "migration:generate": "typeorm-ts-node-commonjs -d ./src/database.ts migration:generate ./src/database/migration/default",
-    "migration:run": "typeorm-ts-node-commonjs -d ./src/database.ts migration:run",
+    "migration:generate": "typeorm-ts-node-commonjs -d ./src/config/database.ts migration:generate ./src/database/migration/default",
+    "migration:run": "typeorm-ts-node-commonjs -d ./src/config/database.ts migration:run",
     "madge": "madge --circular --extensions ts ./src/database/entity",
     "watchify": "watchify ./dist/scripts/registerHTML.script.js -o dist/build/build.js",
     "watchify2": "watchify ./dist/scripts/login-script-html.js -o dist/build/build2.js"

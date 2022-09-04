@@ -1,7 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
 
-@Entity('accounts')
-export class Account{
+@Entity('logsadmin')
+export class LogsAdmin{
     @PrimaryGeneratedColumn()
     id: number
 
@@ -9,14 +9,11 @@ export class Account{
     username: string
 
     @Column({type: 'text', nullable: false})
+    comment: string
+
+    @Column({type: 'text', nullable: false})
     email: string
 
     @Column({type: 'text', nullable: false})
-    password: string
-
-    @Column({type: 'text', nullable: false})
-    type: 'user' | 'admin' 
-
-    @Column({type: 'text', nullable: false})
-    created_date: string
+    date: string
 }
