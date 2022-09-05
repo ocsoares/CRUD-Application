@@ -4,5 +4,6 @@ declare namespace Express{
         JWT: any
         JWTLogged: JwtPayload
         JWTCodeLogged: JwtPayload
+        outCondition: any
     }
 }
