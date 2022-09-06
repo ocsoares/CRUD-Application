@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import path from 'path';
 import bcrypt from 'bcrypt'
 import { AccountRepository } from '../repositories/AccountRepository'
-import { LogsAdminRepository } from '../repositories/SaveCommentsAdminRepository';
+import { LogsAdminRepository } from '../repositories/LogsAdmin';
 
 const __dirname = path.resolve();
 
@@ -14,8 +14,6 @@ const createANewUserEJS = path.join(__dirname, 'src/views/admin-layouts/create-n
 // Tentar fazer um jeito para quando for para uma ROTA que NÃO existe, Redirecionar para uma Existente e mostrar Alerta !! << 
 
 // Fazer um jeito de quando ATUALIZAR alguma coisa da Conta, DESCONECTAR automaticamente (se estiver logado) (+ Segurança, óbvio) !! <<
-
-// Fazer o COMENTÁRIO ser OBRIGATÓRIO com NO MÍNIMO 1 CAMPO !! <<
 
 export class AdminController{
     async searchUser(req: Request, res: Response, next: NextFunction){
@@ -91,7 +89,7 @@ export class AdminController{
             username,
             email,
             password: encryptPassword,
-            type: 'user',
+            type: 'user', // Um Admin NÃO PODE criar outro ADMIN, pode APENAS criar novos Usuários !! <<
             created_date: currentDate
         });
 
@@ -109,6 +107,10 @@ export class AdminController{
         req.flash('successFlash', 'Usuário criado com sucesso !');
         return res.redirect('/administration');
     }
+
+    // async viewUser(req: Request, res: Response, next: NextFunction){
+
+    // }
 
         // Deixei tudo Opcional aqui porque o Admin pode querer atualizar apenas UM campo, ou Dois, etc... !! <<
     async editUser(req: Request, res: Response, next: NextFunction){
@@ -146,8 +148,8 @@ export class AdminController{
             }
         }
 
-        if(password){
-            if(password !== confirm_password){
+        if(password || confirm_password){
+            if(password !== confirm_password || confirm_password !== password){
                 req.flash('errorFlash', 'As senhas não coincidem !');
                 return res.redirect(`/edituser/${idAccount}`);
             }
@@ -174,6 +176,11 @@ export class AdminController{
             return res.redirect(`/edituser/${idAccount}`);
         }
 
+        if(comment && !username && comment && !email && comment && !password && comment && !confirm_password){
+            req.flash('errorFlash', 'Preencha algum campo !');
+            return res.redirect(`/edituser/${idAccount}`);
+        }
+
         const currentDate = new Date().toLocaleDateString('pt-BR');
 
         await AccountRepository.update(idAccount, {
@@ -195,6 +202,34 @@ export class AdminController{
         await LogsAdminRepository.save(saveCommentsThisAccount);
 
         req.flash('successFlash', 'Conta atualizada com sucesso !');
+        return res.redirect('/administration');
+    }
+
+    async deleteUser(req: Request, res: Response, next: NextFunction){
+        const { idAccount } = req.params;
+        const { comment } = req.body;
+
+        const searchUserByID = await AccountRepository.findOneBy({id: Number(idAccount)});
+
+        if(!comment){
+            req.flash('errorFlash', 'Forneça algum comentário !');
+            return res.redirect(`/deleteuser/${idAccount}`);
+        }
+
+        await AccountRepository.delete(idAccount);
+
+        const currentDate = new Date().toLocaleDateString('pt-BR');
+
+        const saveLogsAdmin = LogsAdminRepository.create({
+            username: searchUserByID?.username,
+            email: searchUserByID?.email,
+            date: currentDate,
+            comment: 'deleteAccount: ' + comment
+        })
+
+        await LogsAdminRepository.save(saveLogsAdmin);
+
+        req.flash('successFlash', 'Conta deletada com sucesso !');
         return res.redirect('/administration');
     }
 }
