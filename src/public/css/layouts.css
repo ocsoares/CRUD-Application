@@ -17,3 +17,26 @@ nav #adm{
 #create-user-background{
     background-color: #343a46;
 }
+
+#teste{
+    margin-left: 160px;
+}
+
+#add-post{
+    position: absolute;
+    text-align: center;
+    margin-top: 7px;
+    margin-left: 1270px;
+}
+
+#add-post-text{
+    text-align: center;
+}
+
+.cards-wrapper{
+    margin-top: 20px;
+}
+
+.date{
+    position: absolute;
+}

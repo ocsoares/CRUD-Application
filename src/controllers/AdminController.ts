@@ -22,11 +22,10 @@ export class AdminController{
         try{
                                                                                 // Tive que por o body entre '' por causa do SQL !! <<
         const searchUserDatabase = await AccountRepository.query(`SELECT * FROM accounts WHERE username LIKE '${searchReqBody}' OR email LIKE '${searchReqBody}' OR type LIKE '${searchReqBody}' OR created_date LIKE '${searchReqBody}'`);
-        
-            // Caso não exista, AUTOMATICAMENTE da Erro e cai no Catch !! <<
-        if(!searchUserDatabase){
+        console.log(searchUserDatabase.length); // lenght NESSE caso, mostra a QUANTIDADE de Resultados achados no Banco de Dados pela Pesquisa !! <<
 
-                // Logo, ISSO aqui NÃO é necessário, Coloquei só por Precaução !! <<
+            // Caso NÃO achar nenhum Resultado no Banco de Dados, RETORNA Erro !! <<
+        if(searchUserDatabase.length === 0){
             req.flash('errorFlash', 'Não foi possível encontrar o usuário !');
             return res.redirect('/administration');
         }

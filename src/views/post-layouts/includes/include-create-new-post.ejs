@@ -1,0 +1,37 @@
+<body class="create-new-user-body">
+
+    <div class="col-6">
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="floatingInput" placeholder="Nome do autor (FIXO)" name="author" value="<%- searchUserByID.username %>" disabled>
+        <label for="floatingInput">Nome do autor</label>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="form-floating mb-3">
+        <input type="email" class="form-control" id="floatingInput" placeholder="Email (FIXO)" name="email" value="<%- searchUserByID.email %>" disabled>
+        <label for="floatingInput">Email</label>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="form-floating mb-3">
+        <input class="form-control" id="floatingInput" placeholder="Título" name="title" required>
+        <label for="floatingInput">Título (máximo de 42 caracteres)</label>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="form-floating mb-3">
+        <input class="form-control" id="floatingInput" placeholder="Publicado em (DATA FIXA)" name="date" value="<%- currentTime %>" disabled>
+        <label for="floatingInput">Publicado em</label>
+      </div>
+    </div>
+    <div class="col-12">
+      <div class="form-floating mb-3">
+        <textarea class="form-control" placeholder="Escreva a sua postagem..." id="comments" name="post" style="height: 200px" required></textarea>
+        <label for="comments">Escreva a sua postagem... (máximo de 1000 caracteres)</label>
+      </div>
+    </div>
+    <div class="col-12 d-grid">
+      <button class="btn btn-primary" type="submit">Criar novo post</button>
+    </div>
+  
+  </body>
