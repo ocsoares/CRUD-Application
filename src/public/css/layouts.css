@@ -40,3 +40,8 @@ nav #adm{
 .date{
     position: absolute;
 }
+
+#delete-post{
+    position: absolute;
+    margin-left: 1380px;
+}

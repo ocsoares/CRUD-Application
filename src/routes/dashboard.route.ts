@@ -12,6 +12,7 @@ const __dirname = path.resolve();
 const dashboardEJS = path.join(__dirname, 'src/views/post-layouts/dashboard.ejs');
 const myPostsEJS = path.join(__dirname, '/src/views/post-layouts/my-posts.ejs');
 const createNewPostEJS = path.join(__dirname, '/src/views/post-layouts/create-new-post.ejs');
+const viewPostEJS = path.join(__dirname, '/src/views/post-layouts/view-post.ejs');
 
 // Tentar encryptar o URL nas Rotas (NÃO necessariamente daqui) que usa ID na URL !! << 
 
@@ -39,8 +40,24 @@ dashboardRoute.get('/myposts', new VerificationAccount().checkIfUserAreLogged, a
 })
 
     // Fazer um EJS para Visualizar uma Postagem COMPLETA !! <<
-dashboardRoute.get('/viewpost/:idPost', new VerificationAccount().checkIfUserAreLogged, (req: Request, res: Response) => {
-    // res.render()
+dashboardRoute.get('/viewpost/:idPost', new VerificationAccount().checkIfUserAreLogged, async (req: Request, res: Response) => {
+    const { idPost } = req.params
+
+    try{
+    const searchPost = await PostsRepository.findOneBy({id: Number(idPost)});
+    console.log('POST:', searchPost);
+
+    if(!searchPost){
+        req.flash('errorFlash', 'Post não encontrado !');
+        return res.redirect('/myposts');
+    }
+
+    return res.render(viewPostEJS, { searchPost });
+    }
+    catch(error){
+        req.flash('errorFlash', 'Post não encontrado !');
+        return res.redirect('/myposts');
+    }
 })
 
     // FAZER uma Rota para PESQUISAR Posts no Myposts !! <<

@@ -11,7 +11,7 @@
     "migration:generate": "typeorm-ts-node-commonjs -d ./src/config/database.ts migration:generate ./src/database/migration/default",
     "migration:run": "typeorm-ts-node-commonjs -d ./src/config/database.ts migration:run",
     "madge": "madge --circular --extensions ts ./src/database/entity",
-    "watchify": "watchify ./dist/scripts/registerHTML.script.js -o dist/build/build.js",
+    "watchify": "watchify ./dist/scripts/include-view-post.script.js -o dist/build-scripts/include-view-post.js",
     "watchify2": "watchify ./dist/scripts/login-script-html.js -o dist/build/build2.js"
   },
   "keywords": [],
@@ -64,6 +64,7 @@
     "nodemailer": "^6.7.8",
     "pg": "^8.7.3",
     "reflect-metadata": "^0.1.13",
+    "sweetalert2": "^11.4.32",
     "typeorm": "^0.3.7"
   },
   "proxy": ""
