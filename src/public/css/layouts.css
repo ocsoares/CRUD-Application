@@ -45,3 +45,8 @@ nav #adm{
     position: absolute;
     margin-left: 1380px;
 }
+
+.no-post{
+    text-align: center;
+    margin-top: 210px;
+}

@@ -16,8 +16,17 @@ const viewPostEJS = path.join(__dirname, '/src/views/post-layouts/view-post.ejs'
 
 // Tentar encryptar o URL nas Rotas (NÃO necessariamente daqui) que usa ID na URL !! << 
 
-dashboardRoute.get('/dashboard', new VerificationAccount().checkIfUserAreLogged, (req: Request, res: Response) => {
-    res.render(dashboardEJS);
+// No dashboard, mudar o EJS para mostrar TODAS as Postagens publicadas no Banco de Dados !! <<
+
+// >>CRÍTICO<<: Arrumar para NÃO permitir acessar os Posts de OUTRO usuário no /viewpost/id, porque PODE EXCLUIR !! <<
+
+dashboardRoute.get('/dashboard', new VerificationAccount().checkIfUserAreLogged, async (req: Request, res: Response) => {
+    const searchAllPosts = await PostsRepository.query('SELECT * FROM POSTS');
+    console.log('TODOS POSTS:', searchAllPosts);
+
+    // TERMINAR ISSO !! <<
+
+    res.render(dashboardEJS, { searchAllPosts });
 });
 
     // FAZER uma Rota para PESQUISAR Posts no Dashboard !! <<
@@ -29,7 +38,6 @@ dashboardRoute.get('/myposts', new VerificationAccount().checkIfUserAreLogged, a
 
     try{
         const searchAuthorPost = await PostsRepository.query(`SELECT * FROM posts WHERE author = '${username}'`);
-        console.log(searchAuthorPost);
 
         return res.render(myPostsEJS, { searchAuthorPost });
     }
@@ -40,12 +48,14 @@ dashboardRoute.get('/myposts', new VerificationAccount().checkIfUserAreLogged, a
 })
 
     // Fazer um EJS para Visualizar uma Postagem COMPLETA !! <<
-dashboardRoute.get('/viewpost/:idPost', new VerificationAccount().checkIfUserAreLogged, async (req: Request, res: Response) => {
+dashboardRoute.get('/myposts/viewpost/:idPost', new VerificationAccount().checkIfUserAreLogged, async (req: Request, res: Response) => {
+    
+    const { username } = req.JWTLogged;
     const { idPost } = req.params
 
-    try{
-    const searchPost = await PostsRepository.findOneBy({id: Number(idPost)});
-    console.log('POST:', searchPost);
+    try{                    // Pesquisar no DB por Author e ID para EVITAR que OUTRO Usuário acesse !! <<
+    const searchPost = await PostsRepository.findOneBy({author: username, id: Number(idPost)});
+    console.log(searchPost);
 
     if(!searchPost){
         req.flash('errorFlash', 'Post não encontrado !');
@@ -60,6 +70,9 @@ dashboardRoute.get('/viewpost/:idPost', new VerificationAccount().checkIfUserAre
     }
 })
 
+dashboardRoute.post('/myposts/viewpost/:idPost', new VerificationAccount().checkIfUserAreLogged, new DashboardController().deletePost, (req: Request, res: Response) => {
+})
+
     // FAZER uma Rota para PESQUISAR Posts no Myposts !! <<
 // dashboardRoute.post('/myposts', new VerificationAccount().checkIfUserAreLogged, pesquisar..., (req: Request, res: Response) => {
 // })
@@ -72,7 +85,6 @@ dashboardRoute.get('/createpost', new VerificationAccount().checkIfUserAreLogged
 
     try{
         const searchUserByID = await AccountRepository.findOneBy({id});
-        console.log(searchUserByID);
 
         if(!searchUserByID){
             req.flash('errorFlash', 'Não foi possível acessar essa conta !');

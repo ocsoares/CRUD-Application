@@ -24,14 +24,6 @@ export class DashboardController{
             req.flash('errorFlash', 'Número maximo de caracteres ultrapassado na postagem !');
             return res.redirect('/createpost');
         }
-        
-        console.log('INFOS:', {
-            author,
-            email,
-            title,
-            date,
-            post
-        })
 
         if(!searchUserByEmail){
             req.flash('errorFlash', 'Não foi possível acessar sua conta !');
@@ -60,5 +52,20 @@ export class DashboardController{
 
         req.flash('successFlash', 'Postagem criada com sucesso !');
         return res.redirect('/myposts');
+    }
+
+        // Por algum motivo, o AJAX no .ejs NÃO Redireciona e NÃO permite usar o req.flash !! <<  
+    async deletePost(req: Request, res: Response, next: NextFunction){
+        const { idPost } = req.params;
+        
+        const searchPost = await PostsRepository.findOneBy({id: Number(idPost)});
+        console.log(searchPost);
+
+        if(!searchPost){
+            req.flash('errorFlash', 'Não foi possível localizar a postagem !');
+            return res.redirect('/myposts');
+        }
+
+        await PostsRepository.delete(idPost);
     }
 }

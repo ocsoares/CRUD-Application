@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import jwt from 'jsonwebtoken' 
+import jwt, { JwtPayload } from 'jsonwebtoken' 
 import path from "path";
 import { redisClient } from "../config/redisConfig";
 import { AccountRepository } from "../repositories/AccountRepository";
@@ -20,9 +20,6 @@ const administrationRouteHTML = path.join(__dirname, '/src/views/admin-panel.ejs
 // POR ALGUM MOTIVO, o req.flash só está pegando em /account !! <<<<<
 export class VerificationAccount{
     async checkIfUserAreLogged(req: Request, res: Response, next: NextFunction){
-
-        const teste = await AccountRepository.query('SELECT username FROM accounts');
-        console.log(teste);
 
             // Valores dos Cookies !! <<
         const { session_auth } = req.cookies
@@ -45,10 +42,21 @@ export class VerificationAccount{
         }
 
         try{
-                const verifyJWT = jwt.verify(session_auth || session_authadmin, "" + process.env.JWT_HASH);
+                const verifyJWT = jwt.verify(session_auth || session_authadmin, "" + process.env.JWT_HASH) as JwtPayload;
+                const { id } = verifyJWT;
+
+                    // Evita que o Usuário permaneça Logado após por algum Motivo o Usuário for deletado do Banco de Dados !! <<
+                const checkIfUserExistsInDatabase = await AccountRepository.findOneBy({id});
+
+                if(!checkIfUserExistsInDatabase){
+                    res.clearCookie(sessionAuthName);
+                    res.clearCookie(sessionAuthAdminName);
+
+                    req.flash('errorFlash', 'Não foi possível localizar essa conta !');
+                    return res.redirect('/account');
+                }
 
                 const checkJWTBlacklist = await redisClient.get(`blackListJWT_${session_auth || session_authadmin}`);
-                console.log('CHECK BLACKLIST:', checkJWTBlacklist);
 
                 if(checkJWTBlacklist){
                     console.log('EXISTE !!');
@@ -91,7 +99,10 @@ export class VerificationAccount{
         const { session_authadmin } = req.cookies
 
         try{
-            const verifyJWT = jwt.verify(session_authadmin, "" + process.env.JWT_HASH);
+            const verifyJWT = jwt.verify(session_authadmin, "" + process.env.JWT_HASH) as JwtPayload;
+            console.log(verifyJWT);
+
+            const { id } = verifyJWT
 
             const checkJWTBlacklist = await redisClient.get(`blackListJWT_${session_authadmin}`);
 
@@ -110,8 +121,6 @@ export class VerificationAccount{
                 return res.redirect('/admin');
             }
 
-            const { id } = verifyJWT as any
-
             if(!id){
                 res.clearCookie(sessionAuthAdminName);
 
@@ -119,7 +128,16 @@ export class VerificationAccount{
                 return res.redirect('/admin');
             }
 
-            const searchUserById = await AccountRepository.findOneBy({id})
+                // Evita que o Usuário permaneça Logado após por algum Motivo o Usuário for deletado do Banco de Dados !! <<
+            const searchUserById = await AccountRepository.findOneBy({id});
+            console.log(searchUserById);
+
+            if(!searchUserById){
+                res.clearCookie(sessionAuthAdminName);
+
+                req.flash('errorFlash', 'Não foi possível localizar essa conta !');
+                return res.redirect('/admin');
+            }
 
             if(searchUserById?.type !== 'admin'){
                 res.clearCookie(sessionAuthAdminName);

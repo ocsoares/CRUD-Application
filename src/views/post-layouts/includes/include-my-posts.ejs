@@ -10,11 +10,15 @@
         <a href="/createpost" target="_blank" type="button" class="btn btn-primary align-self-end" id="add-post-text">+ Adicionar novo post</a>
     </div>
 </div>
-    
+
+<% if(searchAuthorPost.length === 0) { %>
+    <h5 class="no-post">Você não tem nenhuma postagem publicada.<br>Crie sua primeira postagem no botão ao lado.</h4>
+        <% } %>
+
 <section class="cards-wrapper">
     <% searchAuthorPost.forEach((searchAuthorPost) => { %>
     <div class="card-grid-space">
-        <a class="card" href="/viewpost/<%- searchAuthorPost.id %>"
+        <a class="card" href="/myposts/viewpost/<%- searchAuthorPost.id %>"
             style="--bg-img: url(https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&resize_w=1500&url=https://codetheweb.blog/assets/img/posts/html-syntax/cover.jpg)">
             <div>
                 <h1><%- searchAuthorPost.title %></h1>
