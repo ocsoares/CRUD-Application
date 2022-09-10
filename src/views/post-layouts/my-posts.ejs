@@ -37,31 +37,34 @@
   </div>
   <% } %>
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-      <li class="nav-item">
-        <a id="logout" class="nav-link active" aria-current="page" href="/logout">Sair</a>
-      </li>
-    </ul>
- 
-    <div class="container-fluid">
-      <a id="adm" class="navbar-brand" href="/dashboard">Postagens publicadas</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        </ul>
-
-        <form class="d-flex" method="POST" novalidate>
-          <input class="form-control me-2" type="search" placeholder="Pesquisar postagens" name="search" aria-label="Search">
-          <button class="btn btn-outline-light" type="submit">Pesquisar</button>
-        </form>
-
+  <body class="background-dashboard">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a id="logout" class="nav-link active" aria-current="page" href="/logout">Sair</a>
+        </li>
+      </ul>
+  
+      <div class="container-fluid">
+        <a id="adm" class="navbar-brand" href="/dashboard">Postagens publicadas</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+  
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          </ul>
+  
+          <form class="d-flex" method="POST" novalidate>
+            <input class="form-control me-2" type="search" placeholder="Pesquisar postagens" name="search"
+              aria-label="Search">
+            <button class="btn btn-outline-light" type="submit">Pesquisar</button>
+          </form>
+  
+        </div>
       </div>
-    </div>
-  </nav>
-
-<%- include('./includes/include-my-posts.ejs') %>
+    </nav>
+  
+    <%- include('./includes/include-my-posts.ejs') %>
+  </body>

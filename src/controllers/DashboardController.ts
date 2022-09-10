@@ -1,7 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
+import path from 'path';
 import { AccountRepository } from '../repositories/AccountRepository';
 import { PostsRepository } from '../repositories/PostsRepository';
 
+const __dirname = path.resolve();
+
+const searchUserDashboardEJS = path.join(__dirname, '/src/views/post-layouts/includes/include-search-dashboard.ejs');
+const searchUserMyPostsEJS = path.join(__dirname, '/src/views/post-layouts/includes/include-search-myposts.ejs')
 export class DashboardController{
     async createPost(req: Request, res: Response, next: NextFunction){
 
@@ -67,5 +72,49 @@ export class DashboardController{
         }
 
         await PostsRepository.delete(idPost);
+    }
+
+    async searchPostDashboard(req: Request, res: Response, next: NextFunction){
+        const search = req.body.search + '%';
+
+        try{
+            const searchPostDatabase = await PostsRepository.query(`SELECT * FROM posts WHERE author LIKE '${search}' OR title LIKE '${search}' OR published_in LIKE '${search}'`);
+            console.log(searchPostDatabase);
+            console.log('LENGTH:', searchPostDatabase.length);
+
+            if(searchPostDatabase.length === 0){
+                req.flash('errorFlash', 'Não foi possível encontrar o post !');
+                return res.redirect('/dashboard');
+            }
+ 
+            return res.render(searchUserDashboardEJS, { searchPostDatabase });
+        }
+        catch(error){
+            req.flash('errorFlash', 'Não foi possível encontrar o posr !');
+            return res.redirect('/dashboard');
+        }
+    }
+
+    async searchPostMyPosts(req: Request, res: Response, next: NextFunction){
+        const search = req.body.search + '%';
+        const { username } = req.JWTLogged;
+
+        try {
+            const searchPostDatabase = await PostsRepository.query(`SELECT * FROM posts WHERE author = '${username}' AND title LIKE '${search}'\
+                                                                    OR published_in LIKE '${search}' and author = '${username}'`);
+
+            if(searchPostDatabase.length === 0){
+                req.flash('errorFlash', 'Não foi possível encontrar o post !');
+                return res.redirect('/myposts');
+            }
+                                                                    
+            return res.render(searchUserMyPostsEJS, { searchPostDatabase });
+
+        }
+        catch (error) {
+            console.log(error);
+            req.flash('errorFlash', 'Não foi possível encontrar o post !');
+            return res.redirect('/myposts');
+        }
     }
 }

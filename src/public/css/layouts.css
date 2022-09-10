@@ -1,6 +1,14 @@
-body{
-    background: #8394A1;
+body, .background-dashboard{
+    background-color: #8394A1;
 }
+
+/* td{
+    color: whitesmoke;
+}
+
+#text-color{
+    color: whitesmoke;
+} */
 
 nav #logout{
     font-size: 18px;

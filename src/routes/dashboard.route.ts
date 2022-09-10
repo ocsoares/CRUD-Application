@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import path from "path";
+import { AccountController } from "../controllers/AccountController";
 import { DashboardController } from "../controllers/DashboardController";
 import { VerificationAccount } from "../controllers/VerificationsAccount";
 import { AccountRepository } from "../repositories/AccountRepository";
@@ -13,25 +14,43 @@ const dashboardEJS = path.join(__dirname, 'src/views/post-layouts/dashboard.ejs'
 const myPostsEJS = path.join(__dirname, '/src/views/post-layouts/my-posts.ejs');
 const createNewPostEJS = path.join(__dirname, '/src/views/post-layouts/create-new-post.ejs');
 const viewPostEJS = path.join(__dirname, '/src/views/post-layouts/view-post.ejs');
+const dashboardViewPost = path.join(__dirname, '/src/views/post-layouts/dashboard-viewpost.ejs');
 
-// Tentar encryptar o URL nas Rotas (NÃO necessariamente daqui) que usa ID na URL !! << 
+// Tentar encryptar o URL nas Rotas (NÃO necessariamente daqui) que usa ID na URL !! <<
+//  OBS: Ou colocar uuid no ID !! << 
 
-// No dashboard, mudar o EJS para mostrar TODAS as Postagens publicadas no Banco de Dados !! <<
+// Usar um API para colocar Imagens ALEATÓRIAS no Card !! << 
 
-// >>CRÍTICO<<: Arrumar para NÃO permitir acessar os Posts de OUTRO usuário no /viewpost/id, porque PODE EXCLUIR !! <<
+// Tentar colocar uma Parte do texto no Cartão (com slice) com ... no Final !! <<
 
 dashboardRoute.get('/dashboard', new VerificationAccount().checkIfUserAreLogged, async (req: Request, res: Response) => {
     const searchAllPosts = await PostsRepository.query('SELECT * FROM POSTS');
-    console.log('TODOS POSTS:', searchAllPosts);
-
-    // TERMINAR ISSO !! <<
 
     res.render(dashboardEJS, { searchAllPosts });
 });
 
-    // FAZER uma Rota para PESQUISAR Posts no Dashboard !! <<
-// dashboardRoute.post('/dashboard', new VerificationAccount().checkIfUserAreLogged, pesquisar..., (req: Request, res: Response) => {
-// })
+    // Rota para Pesquisar Posts no Dashboard !! <<
+dashboardRoute.post('/dashboard', new VerificationAccount().checkIfUserAreLogged, new DashboardController().searchPostDashboard, (req: Request, res: Response) => {
+})
+
+dashboardRoute.get('/dashboard/viewpost/:idPost', new VerificationAccount(). checkIfUserAreLogged, async (req: Request, res: Response) => {
+    const { idPost } = req.params;
+
+    try{
+        const searchPost = await PostsRepository.findOneBy({id: Number(idPost)});
+
+        if(!searchPost){
+            req.flash('errorFlash', 'Post não encontrado !');
+            return res.redirect('/dashboard');
+        }
+    
+        return res.render(dashboardViewPost, { searchPost });
+    }
+    catch(error){
+        req.flash('errorFlash', 'Post não encontrado !');
+        return res.redirect('/dashboard');
+    }
+})
 
 dashboardRoute.get('/myposts', new VerificationAccount().checkIfUserAreLogged, async (req: Request, res: Response) => {
     const { username } = req.JWTLogged;
@@ -47,7 +66,10 @@ dashboardRoute.get('/myposts', new VerificationAccount().checkIfUserAreLogged, a
     }
 })
 
-    // Fazer um EJS para Visualizar uma Postagem COMPLETA !! <<
+        // Rota para Pesquisar Posts no Minhas Postagens !! <<
+dashboardRoute.post('/myposts', new VerificationAccount().checkIfUserAreLogged, new DashboardController().searchPostMyPosts, (req: Request, res: Response) => {
+})
+
 dashboardRoute.get('/myposts/viewpost/:idPost', new VerificationAccount().checkIfUserAreLogged, async (req: Request, res: Response) => {
     
     const { username } = req.JWTLogged;
@@ -55,7 +77,6 @@ dashboardRoute.get('/myposts/viewpost/:idPost', new VerificationAccount().checkI
 
     try{                    // Pesquisar no DB por Author e ID para EVITAR que OUTRO Usuário acesse !! <<
     const searchPost = await PostsRepository.findOneBy({author: username, id: Number(idPost)});
-    console.log(searchPost);
 
     if(!searchPost){
         req.flash('errorFlash', 'Post não encontrado !');
@@ -70,12 +91,9 @@ dashboardRoute.get('/myposts/viewpost/:idPost', new VerificationAccount().checkI
     }
 })
 
+    // Rota para DELETAR uma Postagem do PRÓPRIO USUÁRIO !! <<
 dashboardRoute.post('/myposts/viewpost/:idPost', new VerificationAccount().checkIfUserAreLogged, new DashboardController().deletePost, (req: Request, res: Response) => {
 })
-
-    // FAZER uma Rota para PESQUISAR Posts no Myposts !! <<
-// dashboardRoute.post('/myposts', new VerificationAccount().checkIfUserAreLogged, pesquisar..., (req: Request, res: Response) => {
-// })
 
 dashboardRoute.get('/createpost', new VerificationAccount().checkIfUserAreLogged, async (req: Request, res: Response) => {
         // Usar esse JWTLogged para colocar os Valores FIXOS no EJS !! <<

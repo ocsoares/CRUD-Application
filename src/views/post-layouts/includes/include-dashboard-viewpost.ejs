@@ -1,0 +1,52 @@
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.22.2/sweetalert2.min.css" rel="stylesheet"/>
+    <!-- <link rel="stylesheet" href="sweetalert2.min.css"> ISSO AQUI por algum motivo estava indo no req.params ????? !! << -->
+</head>
+
+<body>
+    <div class="view-user p-5">
+            
+        <div class="row mb-5">
+            <div class="col text-center">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Autor</th>
+                            <th scope="col">Título</th>
+                            <th scope="col">Publicado em</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <%- searchPost.author %>
+                            </td>
+                            <td>
+                                <%- searchPost.title %>
+                            </td>
+                            <td>
+                                <%- searchPost.published_in %>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <b>Texto</b>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col" id="text-color">
+                    <%- searchPost.text %>
+                        <br>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/7.22.2/sweetalert2.min.js"></script>
+</body>
