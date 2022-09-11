@@ -19,8 +19,6 @@ const changeForgotPasswordEJS = path.join(__dirname, '/src/views/changeforgotpas
 
 // Colocar Tamanho MÍNIMO para Usuários e Senhas !! <<
 
-// Fazer uma Pequena LOGO de Home para voltar a Página de Login/Register !! <<
-
 // Quando colocar para Deploy, deixar PÚBLICO uma Conta ADMIN (com email/senha) !! <<
 
 export class AccountController{

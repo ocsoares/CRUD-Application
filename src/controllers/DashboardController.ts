@@ -63,7 +63,7 @@ export class DashboardController{
     async deletePost(req: Request, res: Response, next: NextFunction){
         const { idPost } = req.params;
         
-        const searchPost = await PostsRepository.findOneBy({id: Number(idPost)});
+        const searchPost = await PostsRepository.findOneBy({id: idPost});
         console.log(searchPost);
 
         if(!searchPost){

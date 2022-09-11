@@ -12,12 +12,6 @@ const administrationRouteHTML = path.join(__dirname, '/src/views/admin-panel.ejs
 
 //  OBS: Não limpei o Cookie na >Verificação do NOME< porque ele vai ser UNDEFINED se for inválido, então NÃO vai ter NOME e nem VALOR !! <<
 // Logo, tudo abaixo dele VAI TER O NOME !! <<
-
-// Fazer alertas no Flash caso for usar return res.redirect('...') !! <<
-
-// Fazer um Alerta para o .catch !! <<
-
-// POR ALGUM MOTIVO, o req.flash só está pegando em /account !! <<<<<
 export class VerificationAccount{
     async checkIfUserAreLogged(req: Request, res: Response, next: NextFunction){
 

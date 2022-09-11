@@ -1,9 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
-
 @Entity('posts')
 export class Posts{
-    @PrimaryGeneratedColumn()
-    id: number
+    @PrimaryGeneratedColumn('uuid')
+    id: string
 
     @Column({type: 'text', nullable: false})
     author: string

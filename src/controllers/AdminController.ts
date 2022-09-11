@@ -11,8 +11,6 @@ const createANewUserEJS = path.join(__dirname, 'src/views/admin-layouts/create-n
 
 // Tentar permitir procurar pelo ID !! <<
 
-// Tentar fazer um jeito para quando for para uma ROTA que NÃO existe, Redirecionar para uma Existente e mostrar Alerta !! << 
-
 // Fazer um jeito de quando ATUALIZAR alguma coisa da Conta, DESCONECTAR automaticamente (se estiver logado) (+ Segurança, óbvio) !! <<
 
 export class AdminController{

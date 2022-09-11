@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import 'reflect-metadata' // Typescript pede para Importar !! <<
 import { DataSource } from 'typeorm'
 
 export const AppDataSource = new DataSource({

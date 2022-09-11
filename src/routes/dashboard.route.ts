@@ -16,12 +16,9 @@ const createNewPostEJS = path.join(__dirname, '/src/views/post-layouts/create-ne
 const viewPostEJS = path.join(__dirname, '/src/views/post-layouts/view-post.ejs');
 const dashboardViewPost = path.join(__dirname, '/src/views/post-layouts/dashboard-viewpost.ejs');
 
-// Tentar encryptar o URL nas Rotas (NÃO necessariamente daqui) que usa ID na URL !! <<
-//  OBS: Ou colocar uuid no ID !! << 
-
-// Usar um API para colocar Imagens ALEATÓRIAS no Card !! << 
-
 // Tentar colocar uma Parte do texto no Cartão (com slice) com ... no Final !! <<
+
+// FAZER UM Markdown .md para Anotar as coisas que tenho que Fazer (para não ficar marcado em Arquivos diferentes) !! <<
 
 dashboardRoute.get('/dashboard', new VerificationAccount().checkIfUserAreLogged, async (req: Request, res: Response) => {
     const searchAllPosts = await PostsRepository.query('SELECT * FROM POSTS');
@@ -37,7 +34,7 @@ dashboardRoute.get('/dashboard/viewpost/:idPost', new VerificationAccount(). che
     const { idPost } = req.params;
 
     try{
-        const searchPost = await PostsRepository.findOneBy({id: Number(idPost)});
+        const searchPost = await PostsRepository.findOneBy({id: idPost});
 
         if(!searchPost){
             req.flash('errorFlash', 'Post não encontrado !');
@@ -76,7 +73,7 @@ dashboardRoute.get('/myposts/viewpost/:idPost', new VerificationAccount().checkI
     const { idPost } = req.params
 
     try{                    // Pesquisar no DB por Author e ID para EVITAR que OUTRO Usuário acesse !! <<
-    const searchPost = await PostsRepository.findOneBy({author: username, id: Number(idPost)});
+    const searchPost = await PostsRepository.findOneBy({author: username, id: idPost});
 
     if(!searchPost){
         req.flash('errorFlash', 'Post não encontrado !');

@@ -21,6 +21,10 @@ import connectFlash from 'connect-flash'
 // EVITAR usar console.log com as Mensagens FLASH, porque BUGA !! <<
 // NÃO usar Nome de Variável JÁ EXISTENTE (mesmo se NÃO estiver usando) para Mensagens FLASH, porque BUGA !!
 
+const __dirname = path.resolve();
+
+const notFoundEJS = path.join(__dirname, '/src/views/not-found.ejs');
+
 AppDataSource.initialize().then(() => {
     const server = express();
 
@@ -76,8 +80,6 @@ AppDataSource.initialize().then(() => {
         next();
     })
 
-    const apenastesteEJS = path.join(__dirname, '/src/views/apenasteste.ejs')
-
         // Middleware de Flash Messages !! <<
     server.use((req: Request, res: Response, next: NextFunction) => {
         res.locals.errorFlash = req.flash('errorFlash');
@@ -85,35 +87,15 @@ AppDataSource.initialize().then(() => {
         next();
       });
 
-    server.get('/teste', (req: Request, res: Response) => {
-                // FUNCIONO ! 
-        // req.flash('teste', 'arrozpreto');
-        // res.redirect('/testemsg');
-
-        let arroz = 3
-        if(arroz === 3){
-            req.flash('errorFlash', 'TESTEEEEEEEEEEEEEEEEEEE'); 
-            res.redirect('/testemsg');
-        }
-
-        else{
-            req.flash('errorFlash', 'testedois PORRAA KKK')
-            res.redirect('/testemsg');
-        }
-    })
-
-    server.get('/testemsg', (req: Request, res: Response) => {
-            // FUNCIONO !! 
-        // res.send(req.flash('teste'))
-
-        res.render(apenastesteEJS);
-    })
-
     server.use(registerLoginRoute);
     server.use(dashboardRoute);
     server.use(administrationRoute);
-    
 
+      // Usado para Rotas NÃO EXISTENTES (obviamente tem que ser por Último, DEPOIS de Todas as Rotas Usadas) !! <<
+    server.get('*', (req: Request, res: Response) => {
+        res.render(notFoundEJS);
+    })
+    
     return server.listen(process.env.PORT || port, () => {
         if (process.env.NODE_ENV === 'production') {
             console.log('Servidor rodando remotamente no Heroku !');
