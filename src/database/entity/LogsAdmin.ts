@@ -5,6 +5,9 @@ export class LogsAdmin{
     @PrimaryGeneratedColumn()
     id: number
 
+    @Column({type: 'int', nullable: true})
+    id_real_account: number
+
     @Column({type: 'text', nullable: false})
     username: string
 

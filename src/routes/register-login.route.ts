@@ -17,12 +17,9 @@ const changeForgotPasswordEJS = path.join(__dirname, '/src/views/changeforgotpas
 
 registerLoginRoute.get('/account', new VerificationAccount().blockRegisterLoginPageIfLogged, (req: Request, res: Response) => {
     res.render(registerLoginRouteEJS, res.locals.alerts);
-                                //, {teste: 'FODASE KKK'} << Exemplo q pode ser usado no .ejs !! <<
 })
 
 registerLoginRoute.post('/account', new AccountController().registerOrLoginAccount, (req: Request, res: Response) => {
-    console.log('COOKIE:', req.cookies);
-    console.log('SignedCookies kk:', req.signedCookies);
 })
 
 registerLoginRoute.get('/logout', new VerificationAccount().checkIfUserAreLogged,
@@ -36,7 +33,6 @@ registerLoginRoute.get('/forgotpassword', new VerificationAccount().blockRegiste
 
 registerLoginRoute.post('/forgotpassword', new VerificationAccount().blockRegisterLoginPageIfLogged,
 new AccountController().forgotPassword, sendNodemailerToResetPass(), (req: Request, res: Response) => {
-    // Fazer um Verification() que retorna um Render para Colocar mensagem de ERRO ou Sucesso !! <<
 })
 
     // FAZER um Middleware para Verificar se o JWT é válido !! << PENSAR se tem que por no POST também, ACHO que não...

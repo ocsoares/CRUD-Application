@@ -64,7 +64,6 @@ export class DashboardController{
         const { idPost } = req.params;
         
         const searchPost = await PostsRepository.findOneBy({id: idPost});
-        console.log(searchPost);
 
         if(!searchPost){
             req.flash('errorFlash', 'Não foi possível localizar a postagem !');
@@ -79,8 +78,6 @@ export class DashboardController{
 
         try{
             const searchPostDatabase = await PostsRepository.query(`SELECT * FROM posts WHERE author LIKE '${search}' OR title LIKE '${search}' OR published_in LIKE '${search}'`);
-            console.log(searchPostDatabase);
-            console.log('LENGTH:', searchPostDatabase.length);
 
             if(searchPostDatabase.length === 0){
                 req.flash('errorFlash', 'Não foi possível encontrar o post !');

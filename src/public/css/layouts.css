@@ -2,6 +2,21 @@ body, .background-dashboard{
     background-color: #8394A1;
 }
 
+#block-button{
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.65;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+#home-icon{
+    position: absolute;
+    color: #343a46;
+    margin-left: 350px;
+}
+
 /* td{
     color: whitesmoke;
 }

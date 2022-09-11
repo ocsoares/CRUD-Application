@@ -16,11 +16,6 @@ const changeForgotPasswordEJS = path.join(__dirname, '/src/views/changeforgotpas
 //  OBS: Os admins vão ser setados Diretamente no Banco de Dados, Alterando o type (acho....) !! <<
 // >> Nessa lógica, todos os Usuários Registrado AQUI NÃO serão admin's !! <<
 // Query Command: UPDATE accounts SET type = 'admin' WHERE id = ...
-
-// Colocar Tamanho MÍNIMO para Usuários e Senhas !! <<
-
-// Quando colocar para Deploy, deixar PÚBLICO uma Conta ADMIN (com email/senha) !! <<
-
 export class AccountController{
     async registerOrLoginAccount(req: Request, res: Response, next: NextFunction){
 
@@ -47,6 +42,25 @@ export class AccountController{
             const searchUserByUsername = await AccountRepository.findOneBy({username: registerUsername});
             const searchUserByEmail = await AccountRepository.findOneBy({email: registerEmail})
 
+            if(registerUsername.length <= 10){
+                req.flash('errorFlash', 'Digite um nome maior que 10 caracteres !');
+                return res.redirect('/account');
+            }
+
+            if(registerEmail.length <= 10){
+                req.flash('errorFlash', 'Digite um email maior que 10 caracteres !');
+                return res.redirect('/account');
+            }
+
+            if(registerPassword.length <= 6){
+                req.flash('errorFlash', 'Digite uma senha maior que 6 caracteres !');
+                return res.redirect('/account');
+            }
+
+            if(registerConfirmPassword.length <= 6){
+                req.flash('errorFlash', 'Digite uma senha maior que 6 caracteres !');
+                return res.redirect('/account');
+            }
 
             if(searchUserByUsername){
                 res.locals.alerts.userExists = true;
@@ -118,10 +132,6 @@ export class AccountController{
             const searchUserByEmail = await AccountRepository.findOneBy({email: loginEmail})
 
             if(!searchUserByEmail){
-                // req.flash('errorFlash', 'testeum fi kkkkkkkk');
-                // req.flash('errorFlash', 'f');
-                // console.log('FLASH:', req.flash('errorFlash', 'testeum fi kkkkkkkk'));
-                // return res.redirect('/account');
                 res.locals.alerts.errorLogin = true;
                 return res.render(registerLoginRouteHTML, res.locals.alerts);
             }
@@ -152,8 +162,6 @@ export class AccountController{
         // --------------------------------
 
         else{
-            console.log('INVÁLIDO !');
-
             res.locals.alerts.invalidData = true;
 
             return res.render(registerLoginRouteHTML, res.locals.alerts);
@@ -189,8 +197,6 @@ export class AccountController{
 
         const { adminEmail, adminPassword } = req.body
 
-        console.log('req.body INTEIRO:', req.body);
-
         if(!adminEmail || !adminPassword){
             res.locals.alerts.invalidData = true
             return res.render(administrationRouteHTML, res.locals.alerts);
@@ -211,10 +217,7 @@ export class AccountController{
             res.locals.alerts.errorLogin = false;
         }
 
-        console.log('TYPE ADMIN:', searchUserAdminByEmail.type);
-
         if(searchUserAdminByEmail.type !== 'admin' as any){
-            console.log('NÃO É ADMIN KK !!');
             res.locals.alerts.errorLogin = true;
             return res.render(administrationRouteHTML, res.locals.alerts);
         }
@@ -379,7 +382,6 @@ export class AccountController{
 
         try{
             const verifyJWT = jwt.verify(JWT, "" + process.env.JWT_HASH) as JwtPayload; // JWT usado nesse caso Apenas para as Verificações abaixo !! <<
-            console.log('verifyJWT:', verifyJWT);
 
             const { id, email, iat, exp } = verifyJWT;
 
@@ -411,7 +413,6 @@ export class AccountController{
             const nextTimeToResetAgain = newDate.setMinutes(newDate.getMinutes() + 60);
 
             const searchUserResetPassword = await ResetPasswordsRepository.findOneBy({email: email});
-            console.log('PROCURE USERRESET:', searchUserResetPassword);
             
             if(!searchUserResetPassword){
                 const createUserResetPassword = ResetPasswordsRepository.create({

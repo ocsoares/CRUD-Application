@@ -8,11 +8,6 @@ const __dirname = path.resolve();
 
 const administrationDashboardEJS = path.join(__dirname, '/src/views/admin-layouts/dashboard.ejs');
 const createANewUserEJS = path.join(__dirname, 'src/views/admin-layouts/create-new-user.ejs');
-
-// Tentar permitir procurar pelo ID !! <<
-
-// Fazer um jeito de quando ATUALIZAR alguma coisa da Conta, DESCONECTAR automaticamente (se estiver logado) (+ Segurança, óbvio) !! <<
-
 export class AdminController{
     async searchUser(req: Request, res: Response, next: NextFunction){
         const searchReqBody = req.body.search + '%'; // '%' por causa do LIKE do SQL !! <<
@@ -104,11 +99,7 @@ export class AdminController{
         req.flash('successFlash', 'Usuário criado com sucesso !');
         return res.redirect('/administration');
     }
-
-    // async viewUser(req: Request, res: Response, next: NextFunction){
-
-    // }
-
+    
         // Deixei tudo Opcional aqui porque o Admin pode querer atualizar apenas UM campo, ou Dois, etc... !! <<
     async editUser(req: Request, res: Response, next: NextFunction){
         const { username, email, password, confirm_password, comment } = req.body;
@@ -121,7 +112,11 @@ export class AdminController{
 
         const reallyUser = await AccountRepository.findOneBy({id: Number(idAccount)});
 
-        console.log('SENHA ANTES:', reallyUser?.password);
+            // Verificação aqui no Backend (POST) e no Frontend (na Rota - GET) !! << 
+        if(reallyUser?.type === 'admin'){
+            req.flash('errorFlash', 'Não é possível editar um administrador !');
+            return res.redirect('/administration');
+        }
 
         if(!username && !email && !password && !confirm_password && !comment){
             req.flash('errorFlash', 'Preencha algum campo !');
@@ -153,9 +148,6 @@ export class AdminController{
 
             const encryptPassword = await bcrypt.hash(password, 10);
             req.outCondition = encryptPassword;
-            console.log('PASS:', password);
-            console.log('TESTE ENCRYPT:', encryptPassword);
-
 
             if (!encryptPassword) {
                 req.flash('errorFlash', 'Aconteceu um erro inesperado no servidor !');
@@ -164,9 +156,6 @@ export class AdminController{
         }
 
         const encryptPassword = req.outCondition
-
-        console.log('TESTE KK:', encryptPassword);
-
 
         if(!comment){
             req.flash('errorFlash', 'Escreva algum comentário !');
@@ -187,9 +176,8 @@ export class AdminController{
             created_date: currentDate            
         });
 
-        console.log('SENHA DEPOIS:', reallyUser?.password);
-
         const saveCommentsThisAccount = LogsAdminRepository.create({
+            id_real_account: Number(idAccount),
             username: username || reallyUser?.username,
             email: email || reallyUser?.email,
             date: currentDate,
@@ -208,6 +196,11 @@ export class AdminController{
 
         const searchUserByID = await AccountRepository.findOneBy({id: Number(idAccount)});
 
+        if(searchUserByID?.type === 'admin'){
+            req.flash('errorFlash', 'Não é possível deletar um administrador !');
+            return res.redirect('/administration');
+        }
+
         if(!comment){
             req.flash('errorFlash', 'Forneça algum comentário !');
             return res.redirect(`/deleteuser/${idAccount}`);
@@ -218,6 +211,7 @@ export class AdminController{
         const currentDate = new Date().toLocaleDateString('pt-BR');
 
         const saveLogsAdmin = LogsAdminRepository.create({
+            id_real_account: Number(idAccount),
             username: searchUserByID?.username,
             email: searchUserByID?.email,
             date: currentDate,

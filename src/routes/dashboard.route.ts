@@ -16,10 +16,6 @@ const createNewPostEJS = path.join(__dirname, '/src/views/post-layouts/create-ne
 const viewPostEJS = path.join(__dirname, '/src/views/post-layouts/view-post.ejs');
 const dashboardViewPost = path.join(__dirname, '/src/views/post-layouts/dashboard-viewpost.ejs');
 
-// Tentar colocar uma Parte do texto no Cartão (com slice) com ... no Final !! <<
-
-// FAZER UM Markdown .md para Anotar as coisas que tenho que Fazer (para não ficar marcado em Arquivos diferentes) !! <<
-
 dashboardRoute.get('/dashboard', new VerificationAccount().checkIfUserAreLogged, async (req: Request, res: Response) => {
     const searchAllPosts = await PostsRepository.query('SELECT * FROM POSTS');
 

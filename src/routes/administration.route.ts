@@ -55,13 +55,13 @@ administrationRoute.post('/createuser', new VerificationAccount().checkIfAdminAr
 })
 
     // Nesse caso, NÃO precisa de POST, porque é apenas para VER !! <<
-administrationRoute.get('/viewuser/:idAccount', new VerificationAccount().checkIfAdminAreLogged, async (req: Request, res: Response) => {
+administrationRoute.get('/administration/viewuser/:idAccount', new VerificationAccount().checkIfAdminAreLogged, async (req: Request, res: Response) => {
     const { idAccount } = req.params;
 
         // Coloquei em um Try Catch para NÃO cair o App se NÃO encontrar o ID no Banco de Dados !! <<
     try{
         const searchUserByID = await AccountRepository.findOneBy({id: Number(idAccount)});
-        const searchLogsAdminByID = await LogsAdminRepository.findBy({username: searchUserByID?.username});
+        const searchLogsAdminByID = await LogsAdminRepository.findBy({id_real_account: Number(idAccount)});
 
         if(!searchUserByID){ // Precisa dessa Verificação aqui também para NÃO mostrar o Erro do HTML !! <<
             req.flash('errorFlash', 'ID do usuário inválido !');
@@ -77,7 +77,7 @@ administrationRoute.get('/viewuser/:idAccount', new VerificationAccount().checkI
     }
 })
 
-administrationRoute.get('/edituser/:idAccount', new VerificationAccount().checkIfAdminAreLogged, async (req: Request, res: Response) => {
+administrationRoute.get('/administration/edituser/:idAccount', new VerificationAccount().checkIfAdminAreLogged, async (req: Request, res: Response) => {
     const { idAccount } = req.params;
 
     try{
@@ -85,6 +85,11 @@ administrationRoute.get('/edituser/:idAccount', new VerificationAccount().checkI
 
         if(!searchUserByID){
             req.flash('errorFlash', 'ID do usuário inválido !');
+            return res.redirect('/administration');
+        }
+
+        if(searchUserByID.type === 'admin'){
+            req.flash('errorFlash', 'Não é possível editar um administrador !');
             return res.redirect('/administration');
         }
 
@@ -96,14 +101,19 @@ administrationRoute.get('/edituser/:idAccount', new VerificationAccount().checkI
     }
 })
 
-administrationRoute.post('/edituser/:idAccount', new VerificationAccount().checkIfAdminAreLogged, new AdminController().editUser, (req: Request, res: Response) => {
+administrationRoute.post('/administration/edituser/:idAccount', new VerificationAccount().checkIfAdminAreLogged, new AdminController().editUser, (req: Request, res: Response) => {
 })
 
-administrationRoute.get('/deleteuser/:idAccount', new VerificationAccount().checkIfAdminAreLogged, async (req: Request, res: Response) => {
+administrationRoute.get('/administration/deleteuser/:idAccount', new VerificationAccount().checkIfAdminAreLogged, async (req: Request, res: Response) => {
     const { idAccount } = req.params;
 
     try {
         const searchUserByID = await AccountRepository.findOneBy({ id: Number(idAccount) });
+
+        if(searchUserByID?.type === 'admin'){
+            req.flash('errorFlash', 'Não é possível deletar um administrador !');
+            return res.redirect('/administration');
+        }
 
         if (!searchUserByID) {
             req.flash('errorFlash', 'ID do usuário inválido !');
@@ -118,7 +128,7 @@ administrationRoute.get('/deleteuser/:idAccount', new VerificationAccount().chec
     }
 })
 
-administrationRoute.post('/deleteuser/:idAccount', new VerificationAccount().checkIfAdminAreLogged, new AdminController().deleteUser, (req: Request, res: Response) => {
+administrationRoute.post('/administration/deleteuser/:idAccount', new VerificationAccount().checkIfAdminAreLogged, new AdminController().deleteUser, (req: Request, res: Response) => {
 })
 
 administrationRoute.get('/logout', new VerificationAccount().checkIfAdminAreLogged, (req: Request, res: Response) => {

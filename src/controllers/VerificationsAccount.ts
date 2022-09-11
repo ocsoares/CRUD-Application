@@ -8,8 +8,6 @@ const __dirname = path.resolve();
 
 const administrationRouteHTML = path.join(__dirname, '/src/views/admin-panel.ejs');
 
-// Implementar Redis !! <<
-
 //  OBS: Não limpei o Cookie na >Verificação do NOME< porque ele vai ser UNDEFINED se for inválido, então NÃO vai ter NOME e nem VALOR !! <<
 // Logo, tudo abaixo dele VAI TER O NOME !! <<
 export class VerificationAccount{
@@ -37,10 +35,20 @@ export class VerificationAccount{
 
         try{
                 const verifyJWT = jwt.verify(session_auth || session_authadmin, "" + process.env.JWT_HASH) as JwtPayload;
-                const { id } = verifyJWT;
 
-                    // Evita que o Usuário permaneça Logado após por algum Motivo o Usuário for deletado do Banco de Dados !! <<
+                const { id, username, email } = verifyJWT;
+
+                    // EVITA que o Usuário permaneça Logado após por algum Motivo o Usuário for deletado do Banco de Dados !! <<
                 const checkIfUserExistsInDatabase = await AccountRepository.findOneBy({id});
+
+                    // EVITA que se o Usuário mudar o Usuário/Email ainda Permaneça Logado com o MESMO JWT de Sessão !! <<
+                if(checkIfUserExistsInDatabase?.username !== username || checkIfUserExistsInDatabase?.email !== email){
+                    res.clearCookie(sessionAuthName);
+                    res.clearCookie(sessionAuthAdminName);
+
+                    req.flash('errorFlash', 'Informaçõe da conta alteradas ou inválidas !');
+                    return res.redirect('/account');
+                }
 
                 if(!checkIfUserExistsInDatabase){
                     res.clearCookie(sessionAuthName);
@@ -94,7 +102,6 @@ export class VerificationAccount{
 
         try{
             const verifyJWT = jwt.verify(session_authadmin, "" + process.env.JWT_HASH) as JwtPayload;
-            console.log(verifyJWT);
 
             const { id } = verifyJWT
 
@@ -124,7 +131,6 @@ export class VerificationAccount{
 
                 // Evita que o Usuário permaneça Logado após por algum Motivo o Usuário for deletado do Banco de Dados !! <<
             const searchUserById = await AccountRepository.findOneBy({id});
-            console.log(searchUserById);
 
             if(!searchUserById){
                 res.clearCookie(sessionAuthAdminName);

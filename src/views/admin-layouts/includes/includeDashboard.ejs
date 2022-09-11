@@ -33,9 +33,25 @@
       <td><%- databaseUsers.type %></td>
       <td><%- databaseUsers.created_date %></td>
       <td class="text-center">
-        <a href="/viewuser/<%- databaseUsers.id %>" type="button" id="mamao" class="btn btn-light btn-small"><i class="bi bi-eye"></i>Visualizar</a>
-        <a href="/edituser/<%- databaseUsers.id %>" type="button" class="btn btn-light btn-small"><i class="bi bi-pencil"></i>Editar</a>
-        <a href="/deleteuser/<%- databaseUsers.id %>" type="button" class="btn btn-light btn-small"><i class="bi bi-person-x"></i>Deletar</a>
+        <a href="/administration/viewuser/<%- databaseUsers.id %>" type="button" id="mamao" class="btn btn-light btn-small"><i class="bi bi-eye"></i>Visualizar</a>
+
+        <% if(databaseUsers.type==='admin' ) { %>
+          <a href="/administration/edituser/<%- databaseUsers.id %>" type="button" class="btn btn-light btn-small" id="block-button"><i
+              class="bi bi-pencil"></i>Editar</a>
+        
+          <% } else { %>
+            <a href="/administration/edituser/<%- databaseUsers.id %>" type="button" class="btn btn-light btn-small"><i
+                class="bi bi-pencil"></i>Editar</a>
+            <% } %>
+        
+              <% if(databaseUsers.type==='admin' ) { %>
+                <a href="/administration/deleteuser/<%- databaseUsers.id %>" type="button" class="btn btn-light btn-small" id="block-button"><i
+                    class="bi bi-person-x"></i>Deletar</a>
+        
+                <% } else { %>
+                  <a href="/administration/deleteuser/<%- databaseUsers.id %>" type="button" class="btn btn-light btn-small"><i
+                      class="bi bi-person-x"></i>Deletar</a>
+                  <% } %>
       </td>
     </tr>
     <% });%>
