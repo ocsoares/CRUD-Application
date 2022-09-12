@@ -9,10 +9,6 @@ const redisClient = new Redis({
     // tls: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false as ConnectionOptions
 })
 
-console.log('REDIS_HOST:', process.env.REDIS_HOST);
-console.log('REDIS_PORT:', process.env.REDIS_PORT);
-console.log('NODE_ENV:', process.env.NODE_ENV);
-
 redisClient.on('connect', () => {
     if(process.env.NODE_ENV === 'production'){
         console.log('Redis rodando Remotamente no Render !');
