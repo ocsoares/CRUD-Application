@@ -94,6 +94,11 @@ AppDataSource.initialize().then(() => {
     server.use(dashboardRoute);
     server.use(administrationRoute);
 
+        // Evita que acesse o URL inicial porque não tem nada (Melhor pro Deploy, se não ia ter que adivinhar as Rotas) !! <<
+    server.get('/', (req: Request, res: Response) => {
+        res.redirect('/account');
+    })
+
       // Usado para Rotas NÃO EXISTENTES (obviamente tem que ser por Último, DEPOIS de Todas as Rotas Usadas) !! <<
     server.get('*', (req: Request, res: Response) => {
         res.render(notFoundEJS);
