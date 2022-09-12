@@ -99,11 +99,11 @@ AppDataSource.initialize().then(() => {
     
     return server.listen(process.env.PORT || port, () => {
         if (process.env.NODE_ENV === 'production') {
-            console.log('Servidor rodando remotamente no Heroku !');
+            console.log('Servidor rodando remotamente no Render !');
         }
 
         else {
             console.log(`Servidor rodando localmente em ${localHost}:${port}`);
         }
     })
-})
+}).catch((error) => console.log(error));

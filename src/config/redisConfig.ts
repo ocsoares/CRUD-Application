@@ -15,7 +15,7 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 
 redisClient.on('connect', () => {
     if(process.env.NODE_ENV === 'production'){
-        console.log('Redis rodando Remotamente no Heroku !');
+        console.log('Redis rodando Remotamente no Render !');
     }
 
     else{
