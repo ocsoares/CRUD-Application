@@ -11,7 +11,6 @@ const redisClient = new Redis({
 
 console.log('REDIS_HOST:', process.env.REDIS_HOST);
 console.log('REDIS_PORT:', process.env.REDIS_PORT);
-console.log('ENV:', process.env);
 console.log('NODE_ENV:', process.env.NODE_ENV);
 
 redisClient.on('connect', () => {

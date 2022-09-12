@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import 'reflect-metadata' // Typescript pede para Importar para Funcionar o TypeORM !! <<
 import express, { NextFunction, Request, Response } from 'express'
 import path from 'path'
 import { AppDataSource } from './config/database'
