@@ -22,6 +22,8 @@ import connectFlash from 'connect-flash'
 // EVITAR usar console.log com as Mensagens FLASH, porque BUGA !! <<
 // NÃO usar Nome de Variável JÁ EXISTENTE (mesmo se NÃO estiver usando) para Mensagens FLASH, porque BUGA !!
 
+// Estava dando erro de 'Unhandled promise rejection' no Deploy porque a Inicialização do Banco de Dados (AQUI) estava sem o .catch no FINAL !! <<
+
 const __dirname = path.resolve();
 
 const notFoundEJS = path.join(__dirname, '/src/views/not-found.ejs');
