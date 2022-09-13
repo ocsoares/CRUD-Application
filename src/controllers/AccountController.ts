@@ -44,7 +44,6 @@ export class AccountController{
 
             if(registerUsername.length <= 10){
                 req.flash('errorFlash', 'Digite um nome maior que 10 caracteres !');
-                console.log('errroFlash:', req.flash('errorFlash')); // APAGAR DPS
                 return res.redirect('/account');
             }
 

@@ -16,6 +16,7 @@ const forgotPasswordEJS = path.join(__dirname, '/src/views/forgotpassword.ejs');
 const changeForgotPasswordEJS = path.join(__dirname, '/src/views/changeforgotpassword.ejs');
 
 registerLoginRoute.get('/account', new VerificationAccount().blockRegisterLoginPageIfLogged, (req: Request, res: Response) => {
+    console.log('REQ:', req);
     res.render(registerLoginRouteEJS, res.locals.alerts);
 })
 
