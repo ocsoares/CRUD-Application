@@ -37,35 +37,38 @@ export class AdminController{
 
     async createANewUser(req: Request, res: Response, next: NextFunction){
         const { username, email, password, confirm_password, comment } = req.body;
+        const { id } = req.JWTLogged;
 
         const regexEmail = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
+
+        const searchCurrentAdmin = await AccountRepository.findOneBy({id, type: 'admin'});
 
         const searchUserByUsername = await AccountRepository.findOneBy({username});
         const searchUserByEmail = await AccountRepository.findOneBy({email});
 
         if(!username || !email || !password || !confirm_password || !comment){
             req.flash('errorFlash', 'Preencha todos os campos !');
-            return res.redirect('/createuser');
+            return res.redirect('/administration/createuser');
         }
         
         if(searchUserByUsername){
             req.flash('errorFlash', 'Nome de usuário já cadastrado !');
-            return res.redirect('/createuser');
+            return res.redirect('/administration/createuser');
         }
 
         if(searchUserByEmail){
             req.flash('errorFlash', 'Email já cadastrado !');
-            return res.redirect('/createuser');
+            return res.redirect('/administration/createuser');
         }
 
         if(!email.match(regexEmail)){
             req.flash('errorFlash', 'Digite um email válido !');
-            return res.redirect('/createuser');
+            return res.redirect('/administration/createuser');
         }
 
         if(password !== confirm_password){
             req.flash('errorFlash', 'As senhas não coincidem !');
-            return res.redirect('/createuser');
+            return res.redirect('/administration/createuser');
         }
 
         const encryptPassword = await bcrypt.hash(password, 10);
@@ -90,7 +93,7 @@ export class AdminController{
         const saveCommentsThisAccount = LogsAdminRepository.create({
             username,
             email,
-            comment: 'createAccount: ' + comment,
+            comment: `createAccount by admin = ${searchCurrentAdmin?.username}: ` + comment,
             date: currentDate
         });
 
@@ -120,30 +123,30 @@ export class AdminController{
 
         if(!username && !email && !password && !confirm_password && !comment){
             req.flash('errorFlash', 'Preencha algum campo !');
-            return res.redirect(`/edituser/${idAccount}`);
+            return res.redirect(`/administration/edituser/${idAccount}`);
         }
 
         if(searchUserByUsername){
             req.flash('errorFlash', 'Nome de usuário já cadastrado !');
-            return res.redirect(`/edituser/${idAccount}`);
+            return res.redirect(`/administration/edituser/${idAccount}`);
         }
 
         if(searchUserByEmail){
             req.flash('errorFlash', 'Email já cadastrado !');
-            return res.redirect(`/edituser/${idAccount}`);
+            return res.redirect(`/administration/edituser/${idAccount}`);
         }
 
         if(email){
             if(!email.match(regexEmail)){
                 req.flash('errorFlash', 'Digite um email válido !');
-                return res.redirect(`/edituser/${idAccount}`);
+                return res.redirect(`/administration/edituser/${idAccount}`);
             }
         }
 
         if(password || confirm_password){
             if(password !== confirm_password || confirm_password !== password){
                 req.flash('errorFlash', 'As senhas não coincidem !');
-                return res.redirect(`/edituser/${idAccount}`);
+                return res.redirect(`/administration/edituser/${idAccount}`);
             }
 
             const encryptPassword = await bcrypt.hash(password, 10);
@@ -159,12 +162,12 @@ export class AdminController{
 
         if(!comment){
             req.flash('errorFlash', 'Escreva algum comentário !');
-            return res.redirect(`/edituser/${idAccount}`);
+            return res.redirect(`/administration/edituser/${idAccount}`);
         }
 
         if(comment && !username && comment && !email && comment && !password && comment && !confirm_password){
             req.flash('errorFlash', 'Preencha algum campo !');
-            return res.redirect(`/edituser/${idAccount}`);
+            return res.redirect(`/administration/edituser/${idAccount}`);
         }
 
         const currentDate = new Date().toLocaleDateString('pt-BR');

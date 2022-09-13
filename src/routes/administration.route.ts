@@ -47,11 +47,11 @@ administrationRoute.get('/administration', new VerificationAccount().checkIfAdmi
 administrationRoute.post('/administration', new VerificationAccount().checkIfAdminAreLogged, new AdminController().searchUser, (req: Request, res: Response) => {
 })
 
-administrationRoute.get('/createuser', new VerificationAccount().checkIfAdminAreLogged, (req: Request, res: Response) => {
+administrationRoute.get('/administration/createuser', new VerificationAccount().checkIfAdminAreLogged, (req: Request, res: Response) => {
     res.render(createANewUserEJS);
 })
 
-administrationRoute.post('/createuser', new VerificationAccount().checkIfAdminAreLogged, new AdminController().createANewUser, (req: Request, res: Response) => {
+administrationRoute.post('/administration/createuser', new VerificationAccount().checkIfAdminAreLogged, new AdminController().createANewUser, (req: Request, res: Response) => {
 })
 
     // Nesse caso, NÃO precisa de POST, porque é apenas para VER !! <<

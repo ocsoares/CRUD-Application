@@ -147,6 +147,7 @@ export class VerificationAccount{
             }
 
             if(verifyJWT){
+                req.JWTLogged = verifyJWT;
                 return next();
             }
         }
