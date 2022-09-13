@@ -46,10 +46,10 @@ AppDataSource.initialize().then(() => {
         secret: process.env.COOKIE_SECRET as string,
         saveUninitialized: true,
         resave: true,
-        // cookie: {
-        //     secure: process.env.COOKIE_SECRET === 'production' ? true : false,
-        //     httpOnly: true
-        // }
+        cookie: {
+            secure: process.env.COOKIE_SECRET === 'production' ? true : false,
+            httpOnly: true
+        }
         // name: 'session_app' || 'session_admin',
         // secret: process.env.COOKIE_SECRET,
         // keys: [process.env.COOKIE_SECRET as string],

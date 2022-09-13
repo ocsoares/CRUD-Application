@@ -16,10 +16,10 @@ administrationRoute.use(session({
     secret: process.env.COOKIE_SECRET as string,
     saveUninitialized: true,
     resave: true,
-    // cookie: {
-    //     secure: process.env.COOKIE_SECRET === 'production' ? true : false,
-    //     httpOnly: true
-    // }
+    cookie: {
+        secure: process.env.COOKIE_SECRET === 'production' ? true : false,
+        httpOnly: true
+    }
 }));
 
 // administrationRoute.use(session({
