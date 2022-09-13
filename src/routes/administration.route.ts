@@ -1,7 +1,8 @@
 import bodyParser from "body-parser";
 import { Request, Response, Router } from "express";
 import path from "path";
-import session from 'cookie-session'
+// import session from 'cookie-session'
+import session from 'express-session'
 import { AccountController } from "../controllers/AccountController";
 import { VerificationAccount } from "../controllers/VerificationsAccount";
 import { AccountRepository } from "../repositories/AccountRepository";
@@ -11,13 +12,24 @@ import { LogsAdminRepository } from "../repositories/LogsAdmin";
 const administrationRoute = Router();
 
 administrationRoute.use(session({
-    name: 'session_app',
-    secret: process.env.COOKIE_SECRET,
-    keys: [process.env.COOKIE_SECRET as string],
-    sameSite: 'strict',
-    secure: process.env.COOKIE_SECRET === 'production' ? true : false,
-    httpOnly: true
+    name: 'session_app' || 'session_admin',
+    secret: process.env.COOKIE_SECRET as string,
+    saveUninitialized: true,
+    resave: true,
+    // cookie: {
+    //     secure: process.env.COOKIE_SECRET === 'production' ? true : false,
+    //     httpOnly: true
+    // }
 }));
+
+// administrationRoute.use(session({
+//     name: 'session_app',
+//     secret: process.env.COOKIE_SECRET,
+//     keys: [process.env.COOKIE_SECRET as string],
+//     sameSite: 'strict',
+//     secure: process.env.COOKIE_SECRET === 'production' ? true : false,
+//     httpOnly: true
+// }));
 
 administrationRoute.use(bodyParser.urlencoded({extended: true}));
 administrationRoute.use(bodyParser.json());

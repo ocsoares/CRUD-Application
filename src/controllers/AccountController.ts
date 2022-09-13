@@ -44,6 +44,7 @@ export class AccountController{
 
             if(registerUsername.length <= 10){
                 req.flash('errorFlash', 'Digite um nome maior que 10 caracteres !');
+                req.session.save();
                 return res.redirect('/account');
             }
 

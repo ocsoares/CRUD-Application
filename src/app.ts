@@ -7,8 +7,9 @@ import registerLoginRoute from './routes/register-login.route'
 import administrationRoute from './routes/administration.route'
 import dashboardRoute from './routes/dashboard.route'
 import cors from 'cors'
-import session from 'cookie-session'
-import cookieParser from 'cookie-parser'
+// import session from 'cookie-session'
+import session from 'express-session'
+// import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser';
 import connectFlash from 'connect-flash'
 
@@ -38,15 +39,23 @@ AppDataSource.initialize().then(() => {
     server.set('trust proxy', 1);
     server.set('view engine', 'ejs');
 
-    server.use(cookieParser(process.env.COOKIE_SECRET));
+    // server.use(cookieParser(process.env.COOKIE_SECRET));
 
     server.use(session({
         name: 'session_app' || 'session_admin',
-        secret: process.env.COOKIE_SECRET,
-        keys: [process.env.COOKIE_SECRET as string],
-        sameSite: 'strict',
-        secure: process.env.COOKIE_SECRET === 'production' ? true : false,
-        httpOnly: true,
+        secret: process.env.COOKIE_SECRET as string,
+        saveUninitialized: true,
+        resave: true,
+        // cookie: {
+        //     secure: process.env.COOKIE_SECRET === 'production' ? true : false,
+        //     httpOnly: true
+        // }
+        // name: 'session_app' || 'session_admin',
+        // secret: process.env.COOKIE_SECRET,
+        // keys: [process.env.COOKIE_SECRET as string],
+        // sameSite: 'strict',
+        // secure: process.env.COOKIE_SECRET === 'production' ? true : false,
+        // httpOnly: true,
     }));
 
     server.use(connectFlash());
