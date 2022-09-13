@@ -107,8 +107,11 @@ export class AdminController{
     async editUser(req: Request, res: Response, next: NextFunction){
         const { username, email, password, confirm_password, comment } = req.body;
         const { idAccount } = req.params;
+        const { id } = req.JWTLogged
 
         const regexEmail = new RegExp("([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\"\(\[\]!#-[^-~ \t]|(\\[\t -~]))+\")@([!#-'*+/-9=?A-Z^-~-]+(\.[!#-'*+/-9=?A-Z^-~-]+)*|\[[\t -Z^-~]*])");
+
+        const searchCurrentAdmin = await AccountRepository.findOneBy({id, type: 'admin'});
 
         const searchUserByUsername = await AccountRepository.findOneBy({username});
         const searchUserByEmail = await AccountRepository.findOneBy({email});
@@ -184,7 +187,7 @@ export class AdminController{
             username: username || reallyUser?.username,
             email: email || reallyUser?.email,
             date: currentDate,
-            comment: 'editAccount: ' + comment
+            comment: `editAccount by admin = ${searchCurrentAdmin?.username}: ` + comment
         });
 
         await LogsAdminRepository.save(saveCommentsThisAccount);
@@ -196,6 +199,9 @@ export class AdminController{
     async deleteUser(req: Request, res: Response, next: NextFunction){
         const { idAccount } = req.params;
         const { comment } = req.body;
+        const { id } = req.JWTLogged;
+
+        const searchCurrentAdmin = await AccountRepository.findOneBy({id, type: 'admin'});
 
         const searchUserByID = await AccountRepository.findOneBy({id: Number(idAccount)});
 
@@ -218,7 +224,7 @@ export class AdminController{
             username: searchUserByID?.username,
             email: searchUserByID?.email,
             date: currentDate,
-            comment: 'deleteAccount: ' + comment
+            comment: `deleteAccount by admin = ${searchCurrentAdmin?.username}: ` + comment
         })
 
         await LogsAdminRepository.save(saveLogsAdmin);

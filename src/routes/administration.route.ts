@@ -61,6 +61,7 @@ administrationRoute.get('/administration/viewuser/:idAccount', new VerificationA
         // Coloquei em um Try Catch para NÃO cair o App se NÃO encontrar o ID no Banco de Dados !! <<
     try{
         const searchUserByID = await AccountRepository.findOneBy({id: Number(idAccount)});
+        const searchCreateAccountLog = await LogsAdminRepository.findOneBy({username: searchUserByID?.username, id_real_account: null as unknown as undefined});
         const searchLogsAdminByID = await LogsAdminRepository.findBy({id_real_account: Number(idAccount)});
 
         if(!searchUserByID){ // Precisa dessa Verificação aqui também para NÃO mostrar o Erro do HTML !! <<
@@ -68,7 +69,7 @@ administrationRoute.get('/administration/viewuser/:idAccount', new VerificationA
             return res.redirect('/administration');
         }
 
-        return res.render(viewUserEJS, { searchUserByID, searchLogsAdminByID });
+        return res.render(viewUserEJS, { searchUserByID, searchLogsAdminByID, searchCreateAccountLog });
     }
     catch(error){
         console.log(error);

@@ -32,9 +32,13 @@
       </div>
       <div class="row">
         <div class="col">
-          <% if(searchLogsAdminByID.length === 0){ %>
+          <% if(searchLogsAdminByID.length === 0 && searchCreateAccountLog.id_real_account !== null){ %>
             Não existe logs registrado para essa conta.
           <% }%>
+          <% if(searchCreateAccountLog && searchCreateAccountLog.id_real_account === null) { %>
+            <%- searchCreateAccountLog.comment %>
+            <br>
+            <% } %>
           <% searchLogsAdminByID.forEach((searchLogsAdminByID) => { %> <!-- FORA do <tr> !! << -->
             <%- searchLogsAdminByID.comment %>
             <br>
