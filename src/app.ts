@@ -26,6 +26,8 @@ import { TypeormStoreRepository } from './repositories/TypeormStore'
 
 // Estava dando erro de 'Unhandled promise rejection' no Deploy porque a Inicialização do Banco de Dados (AQUI) estava sem o .catch no FINAL !! <<
 
+// APAGAR TODOS os console.log() !! <<
+
 const __dirname = path.resolve();
 
 const notFoundEJS = path.join(__dirname, '/src/views/not-found.ejs');
@@ -42,12 +44,13 @@ AppDataSource.initialize().then(() => {
 
     server.use(cookieParser(process.env.COOKIE_SECRET));
 
+        // Mudei de cookie-session para express-session por causa que as req.flash NÃO tava funcionando !! <<
     server.use(session({
         name: 'session_app' || 'session_admin',
         secret: process.env.COOKIE_SECRET as string,
         resave: true,
         saveUninitialized: true,
-        store: new TypeormStore({
+        store: new TypeormStore({ // store Necessário para DEPLOY !! <<
             cleanupLimit: 2,
             ttl: 43200, // 12h
             onError: (s: TypeormStore, e: Error) => console.log({

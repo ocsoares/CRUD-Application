@@ -31,12 +31,10 @@
                             const url = document.location.href
                                 const IDIndex = url.indexOf('viewpost/');
                                 const URL_ID = url.slice(IDIndex + 9);
-                                const realURL = url.slice(0, IDIndex + 9);
                                 console.log(URL_ID);
-                                console.log(realURL);
                                 $.ajax({
                                     type: 'POST',
-                                    url: realURL === 'https://crud-web-blog.onrender.com/myposts/viewpost/' ? `https://crud-web-blog.onrender.com/myposts/viewpost/${URL_ID}` : `http://localhost:5000/myposts/viewpost/${URL_ID}`
+                                    url: `/myposts/viewpost/${URL_ID}` // NÃO precisa colocar a URL inteira, apenas as ROTAS (Automaticamente detecta a URL assim) !! <<
                                     // success: () => {   Por algum motivo, o Redirecionamento NÃO funcionou, então tive que usar Embaixo !! <<
                                     //     // document.location.href = '/myposts'
                                     // }

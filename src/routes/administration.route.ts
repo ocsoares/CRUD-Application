@@ -54,9 +54,6 @@ administrationRoute.get('/administration/viewuser/:idAccount', new VerificationA
         const searchCreateAccountLog = await LogsAdminRepository.findOneBy({username: searchUserByID?.username, id_real_account: null as unknown as undefined});
         const searchLogsAdminByID = await LogsAdminRepository.findBy({id_real_account: Number(idAccount)});
 
-        console.log('searchCreate...:', searchCreateAccountLog);
-        console.log('searchLogsAdmin...:', searchLogsAdminByID);
-
         if(!searchUserByID){ // Precisa dessa Verificação aqui também para NÃO mostrar o Erro do HTML !! <<
             req.flash('errorFlash', 'ID do usuário inválido !');
             return res.redirect('/administration');
