@@ -7,7 +7,6 @@ import registerLoginRoute from './routes/register-login.route'
 import administrationRoute from './routes/administration.route'
 import dashboardRoute from './routes/dashboard.route'
 import cors from 'cors'
-// import session from 'cookie-session'
 import session from 'express-session'
 import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser';
@@ -43,8 +42,6 @@ AppDataSource.initialize().then(() => {
 
     server.use(cookieParser(process.env.COOKIE_SECRET));
 
-    console.log('COOKIE_SECRET:', process.env.COOKIE_SECRET);
-
     server.use(session({
         name: 'session_app' || 'session_admin',
         secret: process.env.COOKIE_SECRET as string,
@@ -62,12 +59,6 @@ AppDataSource.initialize().then(() => {
             secure: process.env.NODE_ENV === 'production' ? true : false,
             httpOnly: true
         }
-        // name: 'session_app' || 'session_admin',
-        // secret: process.env.COOKIE_SECRET,
-        // keys: [process.env.COOKIE_SECRET as string],
-        // sameSite: 'strict',
-        // secure: process.env.COOKIE_SECRET === 'production' ? true : false,
-        // httpOnly: true,
     }));
 
     server.use(connectFlash());

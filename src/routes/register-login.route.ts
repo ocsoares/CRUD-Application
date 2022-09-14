@@ -2,12 +2,9 @@ import path from "path";
 import { Request, Response, Router } from "express";
 import { AccountController } from '../controllers/AccountController'
 import { VerificationAccount } from "../controllers/VerificationsAccount";
-import cookieParser from "cookie-parser";
 import { sendNodemailerToResetPass } from "../scripts/nodemailer.script";
 
 const registerLoginRoute = Router();
-
-registerLoginRoute.use(cookieParser()); // Sem isso o req.cookies tb funciona... ??
 
 const __dirname = path.resolve();
 
@@ -16,7 +13,6 @@ const forgotPasswordEJS = path.join(__dirname, '/src/views/forgotpassword.ejs');
 const changeForgotPasswordEJS = path.join(__dirname, '/src/views/changeforgotpassword.ejs');
 
 registerLoginRoute.get('/account', new VerificationAccount().blockRegisterLoginPageIfLogged, (req: Request, res: Response) => {
-    // console.log('REQ:', req);
     res.render(registerLoginRouteEJS, res.locals.alerts);
 })
 

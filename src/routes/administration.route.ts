@@ -1,45 +1,13 @@
 import bodyParser from "body-parser";
 import { Request, Response, Router } from "express";
 import path from "path";
-// import session from 'cookie-session'
-import session from 'express-session'
 import { AccountController } from "../controllers/AccountController";
 import { VerificationAccount } from "../controllers/VerificationsAccount";
 import { AccountRepository } from "../repositories/AccountRepository";
 import { AdminController } from "../controllers/AdminController";
 import { LogsAdminRepository } from "../repositories/LogsAdmin";
-import { TypeormStore } from "connect-typeorm/out/app/TypeormStore/TypeormStore";
-import { TypeormStoreRepository } from "../repositories/TypeormStore";
 
 const administrationRoute = Router();
-
-// administrationRoute.use(session({
-//     name: 'session_admin',
-//         secret: process.env.COOKIE_SECRET as string,
-//         saveUninitialized: true,
-//         resave: true,
-//         store: new TypeormStore({
-//             cleanupLimit: 2,
-//             ttl: 43200, // 12h
-//             onError: (s: TypeormStore, e: Error) => console.log({
-//                 error: e,
-//                 algoS: s
-//             })
-//         }).connect(TypeormStoreRepository),
-//         cookie: {
-//             secure: process.env.COOKIE_SECRET === 'production' ? true : false,
-//             httpOnly: true
-//         }
-// }));
-
-// administrationRoute.use(session({
-//     name: 'session_app',
-//     secret: process.env.COOKIE_SECRET,
-//     keys: [process.env.COOKIE_SECRET as string],
-//     sameSite: 'strict',
-//     secure: process.env.COOKIE_SECRET === 'production' ? true : false,
-//     httpOnly: true
-// }));
 
 administrationRoute.use(bodyParser.urlencoded({extended: true}));
 administrationRoute.use(bodyParser.json());

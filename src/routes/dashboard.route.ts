@@ -1,6 +1,5 @@
 import { Request, Response, Router } from "express";
 import path from "path";
-import { AccountController } from "../controllers/AccountController";
 import { DashboardController } from "../controllers/DashboardController";
 import { VerificationAccount } from "../controllers/VerificationsAccount";
 import { AccountRepository } from "../repositories/AccountRepository";
