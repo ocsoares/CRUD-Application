@@ -12,6 +12,8 @@ import session from 'express-session'
 // import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser';
 import connectFlash from 'connect-flash'
+import { TypeormStore } from 'connect-typeorm/out'
+import { TypeormStoreRepository } from './repositories/TypeormStore'
 
 // Alterei o includes em tsconfig.json de "src/*.ts" para apenas "src/" Porque NÃO estava Transpilando ALGUNS arquivos de .ts para .js no dist !! <<
 
@@ -46,6 +48,14 @@ AppDataSource.initialize().then(() => {
         secret: process.env.COOKIE_SECRET as string,
         saveUninitialized: true,
         resave: true,
+        store: new TypeormStore({
+            cleanupLimit: 2,
+            ttl: 43200, // 12h
+            onError: (s: TypeormStore, e: Error) => console.log({
+                error: e,
+                algoS: s
+            })
+        }).connect(TypeormStoreRepository),
         cookie: {
             secure: process.env.COOKIE_SECRET === 'production' ? true : false,
             httpOnly: true

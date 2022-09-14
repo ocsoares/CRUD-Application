@@ -8,18 +8,28 @@ import { VerificationAccount } from "../controllers/VerificationsAccount";
 import { AccountRepository } from "../repositories/AccountRepository";
 import { AdminController } from "../controllers/AdminController";
 import { LogsAdminRepository } from "../repositories/LogsAdmin";
+import { TypeormStore } from "connect-typeorm/out/app/TypeormStore/TypeormStore";
+import { TypeormStoreRepository } from "../repositories/TypeormStore";
 
 const administrationRoute = Router();
 
 administrationRoute.use(session({
-    name: 'session_app' || 'session_admin',
-    secret: process.env.COOKIE_SECRET as string,
-    saveUninitialized: true,
-    resave: true,
-    cookie: {
-        secure: process.env.COOKIE_SECRET === 'production' ? true : false,
-        httpOnly: true
-    }
+    name: 'session_admin',
+        secret: process.env.COOKIE_SECRET as string,
+        saveUninitialized: true,
+        resave: true,
+        store: new TypeormStore({
+            cleanupLimit: 2,
+            ttl: 43200, // 12h
+            onError: (s: TypeormStore, e: Error) => console.log({
+                error: e,
+                algoS: s
+            })
+        }).connect(TypeormStoreRepository),
+        cookie: {
+            secure: process.env.COOKIE_SECRET === 'production' ? true : false,
+            httpOnly: true
+        }
 }));
 
 // administrationRoute.use(session({
@@ -75,6 +85,9 @@ administrationRoute.get('/administration/viewuser/:idAccount', new VerificationA
         const searchUserByID = await AccountRepository.findOneBy({id: Number(idAccount)});
         const searchCreateAccountLog = await LogsAdminRepository.findOneBy({username: searchUserByID?.username, id_real_account: null as unknown as undefined});
         const searchLogsAdminByID = await LogsAdminRepository.findBy({id_real_account: Number(idAccount)});
+
+        console.log('searchCreate...:', searchCreateAccountLog);
+        console.log('searchLogsAdmin...:', searchLogsAdminByID);
 
         if(!searchUserByID){ // Precisa dessa Verificação aqui também para NÃO mostrar o Erro do HTML !! <<
             req.flash('errorFlash', 'ID do usuário inválido !');
