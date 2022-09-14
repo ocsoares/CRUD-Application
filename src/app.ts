@@ -49,8 +49,8 @@ AppDataSource.initialize().then(() => {
     server.use(session({
         name: 'session_app' || 'session_admin',
         secret: process.env.COOKIE_SECRET as string,
-        saveUninitialized: true,
         resave: true,
+        saveUninitialized: true,
         store: new TypeormStore({
             cleanupLimit: 2,
             ttl: 43200, // 12h
@@ -70,6 +70,9 @@ AppDataSource.initialize().then(() => {
         // secure: process.env.COOKIE_SECRET === 'production' ? true : false,
         // httpOnly: true,
     }));
+
+    server.use(session({secret: process.env.COOKIE_SECRET as string}));
+    console.log('COOKIE_SECRET:', process.env.COOKIE_SECRET);
 
     server.use(connectFlash());
 
