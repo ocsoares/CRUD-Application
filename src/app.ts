@@ -41,11 +41,11 @@ AppDataSource.initialize().then(() => {
     server.set('trust proxy', 1);
     server.set('view engine', 'ejs');
 
-    server.use(cookieParser(process.env.COOKIE_SECRET));
+    server.use(cookieParser('teste'));
 
     server.use(session({
         name: 'session_app' || 'session_admin',
-        secret: process.env.COOKIE_SECRET as string,
+        secret: 'teste' as string,
         resave: true,
         saveUninitialized: true,
         store: new TypeormStore({
@@ -57,14 +57,14 @@ AppDataSource.initialize().then(() => {
             })
         }).connect(TypeormStoreRepository),
         cookie: {
-            secure: process.env.COOKIE_SECRET === 'production' ? true : false,
+            secure: process.env.NODE_ENV === 'production' ? true : false,
             httpOnly: true
         }
         // name: 'session_app' || 'session_admin',
-        // secret: process.env.COOKIE_SECRET,
-        // keys: [process.env.COOKIE_SECRET as string],
+        // secret: 'teste',
+        // keys: ['teste' as string],
         // sameSite: 'strict',
-        // secure: process.env.COOKIE_SECRET === 'production' ? true : false,
+        // secure: 'teste' === 'production' ? true : false,
         // httpOnly: true,
     }));
 

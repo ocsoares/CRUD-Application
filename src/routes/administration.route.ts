@@ -13,24 +13,24 @@ import { TypeormStoreRepository } from "../repositories/TypeormStore";
 
 const administrationRoute = Router();
 
-administrationRoute.use(session({
-    name: 'session_admin',
-        secret: process.env.COOKIE_SECRET as string,
-        saveUninitialized: true,
-        resave: true,
-        store: new TypeormStore({
-            cleanupLimit: 2,
-            ttl: 43200, // 12h
-            onError: (s: TypeormStore, e: Error) => console.log({
-                error: e,
-                algoS: s
-            })
-        }).connect(TypeormStoreRepository),
-        cookie: {
-            secure: process.env.COOKIE_SECRET === 'production' ? true : false,
-            httpOnly: true
-        }
-}));
+// administrationRoute.use(session({
+//     name: 'session_admin',
+//         secret: process.env.COOKIE_SECRET as string,
+//         saveUninitialized: true,
+//         resave: true,
+//         store: new TypeormStore({
+//             cleanupLimit: 2,
+//             ttl: 43200, // 12h
+//             onError: (s: TypeormStore, e: Error) => console.log({
+//                 error: e,
+//                 algoS: s
+//             })
+//         }).connect(TypeormStoreRepository),
+//         cookie: {
+//             secure: process.env.COOKIE_SECRET === 'production' ? true : false,
+//             httpOnly: true
+//         }
+// }));
 
 // administrationRoute.use(session({
 //     name: 'session_app',
