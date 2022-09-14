@@ -43,9 +43,6 @@ AppDataSource.initialize().then(() => {
 
     server.use(cookieParser(process.env.COOKIE_SECRET));
 
-        // secret: process.env.COOKIE_SECRET,
-        // keys: [process.env.COOKIE_SECRET as string],
-
     server.use(session({
         name: 'session_app' || 'session_admin',
         secret: process.env.COOKIE_SECRET as string,
@@ -70,9 +67,6 @@ AppDataSource.initialize().then(() => {
         // secure: process.env.COOKIE_SECRET === 'production' ? true : false,
         // httpOnly: true,
     }));
-
-    server.use(session({secret: process.env.COOKIE_SECRET as string}));
-    console.log('COOKIE_SECRET:', process.env.COOKIE_SECRET);
 
     server.use(connectFlash());
 
