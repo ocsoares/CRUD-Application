@@ -9,7 +9,7 @@ import dashboardRoute from './routes/dashboard.route'
 import cors from 'cors'
 // import session from 'cookie-session'
 import session from 'express-session'
-// import cookieParser from 'cookie-parser'
+import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser';
 import connectFlash from 'connect-flash'
 import { TypeormStore } from 'connect-typeorm/out'
@@ -41,7 +41,10 @@ AppDataSource.initialize().then(() => {
     server.set('trust proxy', 1);
     server.set('view engine', 'ejs');
 
-    // server.use(cookieParser(process.env.COOKIE_SECRET));
+    server.use(cookieParser(process.env.COOKIE_SECRET));
+
+        // secret: process.env.COOKIE_SECRET,
+        // keys: [process.env.COOKIE_SECRET as string],
 
     server.use(session({
         name: 'session_app' || 'session_admin',
