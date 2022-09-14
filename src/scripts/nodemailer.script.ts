@@ -11,7 +11,7 @@ export const sendNodemailerToResetPass = () => (req: Request, res: Response, nex
         port: 465,
         secure: true,
         auth: {
-            user: 'nodevalidation12@gmail.com',
+            user: process.env.NODEMAILER_USER,
             pass: process.env.NODEMAILER_PASS
         },
         tls: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } as any : false
