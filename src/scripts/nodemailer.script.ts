@@ -21,7 +21,13 @@ export const sendNodemailerToResetPass = () => (req: Request, res: Response, nex
         from: 'Node Validation <nodevalidation12@gmail.com>',
         to: forgotEmail,
         subject: 'Link para resetar a senha',
-        html: `<p>Olá ${forgotUsername}, segue o link para resetar a sua senha. Esse link irá se expirar em 15 minutos. Não compartilhe com ninguém e,\
+        html: process.env.NODE_ENV === 'production' ? 
+
+        `<p>Olá ${forgotUsername}, segue o link para resetar a sua senha. Esse link irá se expirar em 15 minutos. Não compartilhe com ninguém e,\
+        após alterada a senha, a próxima alteração só será possível após 1 hora.\n</p>
+        <a href="https://crud-web-blog.onrender.com/changepassword/${req.JWT}" target: "_blank">Clique aqui para ir para o link.</a>`
+        :
+        `<p>Olá ${forgotUsername}, segue o link para resetar a sua senha. Esse link irá se expirar em 15 minutos. Não compartilhe com ninguém e,\
         após alterada a senha, a próxima alteração só será possível após 1 hora.\n</p>
         <a href="http://localhost:5000/changepassword/${req.JWT}" target: "_blank">Clique aqui para ir para o link.</a>`
         
