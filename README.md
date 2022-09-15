@@ -12,6 +12,12 @@ https://www.linkedin.com/in/ocauasoares/
 ## Hospedado/Deploy no Render:
 https://crud-web-blog.onrender.com/ <br>
 
+### Rota para **administração**:
+https://crud-web-blog.onrender.com/admin <br>
+**Conta** de administrador para testes: <br>
+Email: testeadmin@gmail.com <br>
+Senha: testeadmin12
+
 O projeto consiste em um **CRUD** completo em um Blog, com **cadastro**/**login**,  **autenticação** do login, proteção das rotas **apenas** para usuários **logados**,  sistema de postagens, um sistema exclusivo para **administradores** e uma funcionalidade para **resetar** a **senha** se estiver esquecido.
 
 ## Características e funcionalidades do projeto:
