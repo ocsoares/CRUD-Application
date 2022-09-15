@@ -26,13 +26,38 @@ O projeto consiste em um **CRUD** completo em um Blog, com **cadastro**/**login*
 - Funcionalidade de **resetar** a **senha** da conta caso tenha esquecido, enviando por **email** um **token** que permitirá acessar a **rota** para criar uma nova senha. Esse token se expira em **15 minutos** e, após alterar a senha, **não** será permitido alterar novamente por **1 hora**.
 
 ## Registro
-![Registro](https://raw.githubusercontent.com/ocsoares/Sistema-de-login-API-de-CEP-e-Enviar-email-DeployHeroku/master/assets/registro.jpg)
+![Registro](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/registro.jpg)
 
 ## Login
-![Login](https://raw.githubusercontent.com/ocsoares/Sistema-de-login-API-de-CEP-e-Enviar-email-DeployHeroku/master/assets/login.jpg)
+![Login](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/login.jpg)
 
-## Dashboard
-![Dashboard](https://raw.githubusercontent.com/ocsoares/Sistema-de-login-API-de-CEP-e-Enviar-email-DeployHeroku/master/assets/dashboard.jpg)
+## Exemplo de mensagem
+![Exemplo de mensagem](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/exemplo-mensagens.jpg)
+
+## Dashboard e Todas as postagens publicadas
+![Dashboard e Todas as postagens publicadas](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/todas-as-postagens.jpg)
+
+## Minhas postagens (sem posts publicados)
+![Minhas postagens (sem posts publicados)](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/sem-posts.jpg)
+
+## Minhas postagens (com posts publicados)
+![Minhas postagens (com posts publicados)](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/minhas-postagens.jpg)
+
+## Criando postagem
+![Criando postagem](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/criando-posts.jpg)
+
+## Visualizando postagem
+![Visualizando postagem](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/visualizar-postagem.jpg)
+
+## Excluindo postagem
+![Pergunta excluir](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/pergunta-excluir.jpg)
+![Excluido](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/excluido.jpg)
+
+## Login administrador
+![Login administrador](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/admin-panel.jpg)
+
+## Dashboard administrador
+![Dashboard administrador](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/administration.jpg)
 
 # Tecnologias e Bibliotecas utilizadas
 ## Back end
