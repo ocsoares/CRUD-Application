@@ -9,7 +9,7 @@ https://www.linkedin.com/in/ocauasoares/
 
 # Sobre o projeto
 
-## Hospedado no Render:
+## Hospedado/Deploy no Render:
 https://crud-web-blog.onrender.com/ <br>
 
 O projeto consiste em um **CRUD** completo em um Blog, com **cadastro**/**login**,  **autenticação** do login, proteção das rotas **apenas** para usuários **logados**,  sistema de postagens, um sistema exclusivo para **administradores** e uma funcionalidade para **resetar** a **senha** se estiver esquecido.
@@ -30,6 +30,9 @@ O projeto consiste em um **CRUD** completo em um Blog, com **cadastro**/**login*
 
 ## Login
 ![Login](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/login.jpg)
+
+## Esqueci a senha
+![Esqueci a senha](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/esqueci-senha.jpg)
 
 ## Exemplo de mensagem
 ![Exemplo de mensagem](https://raw.githubusercontent.com/ocsoares/CRUD-Web-Blog/master/assets/exemplo-mensagens.jpg)
