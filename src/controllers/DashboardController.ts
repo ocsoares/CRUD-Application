@@ -5,8 +5,8 @@ import { PostsRepository } from '../repositories/PostsRepository';
 
 const __dirname = path.resolve();
 
-const searchUserDashboardEJS = path.join(__dirname, '/src/views/post-layouts/includes/include-search-dashboard.ejs');
-const searchUserMyPostsEJS = path.join(__dirname, '/src/views/post-layouts/includes/include-search-myposts.ejs')
+const searchUserDashboardEJS = path.join(__dirname, '/src/views/post-layouts/search-post-dashboard.ejs');
+const searchUserMyPostsEJS = path.join(__dirname, '/src/views/post-layouts/search-post-myposts.ejs')
 export class DashboardController{
     async createPost(req: Request, res: Response, next: NextFunction){
 
