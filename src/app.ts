@@ -1,18 +1,18 @@
-import 'dotenv/config'
-import 'reflect-metadata' // Typescript pede para Importar para Funcionar o TypeORM !! <<
-import express, { NextFunction, Request, Response } from 'express'
-import path from 'path'
-import { AppDataSource } from './config/database'
-import registerLoginRoute from './routes/register-login.route'
-import administrationRoute from './routes/administration.route'
-import dashboardRoute from './routes/dashboard.route'
-import cors from 'cors'
-import session from 'express-session'
-import cookieParser from 'cookie-parser'
+import 'dotenv/config';
+import 'reflect-metadata'; // Typescript pede para Importar para Funcionar o TypeORM !! <<
+import express, { NextFunction, Request, Response } from 'express';
+import path from 'path';
+import { AppDataSource } from './config/database';
+import registerLoginRoute from './routes/register-login.route';
+import administrationRoute from './routes/administration.route';
+import dashboardRoute from './routes/dashboard.route';
+import cors from 'cors';
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import connectFlash from 'connect-flash'
-import { TypeormStore } from 'connect-typeorm/out'
-import { TypeormStoreRepository } from './repositories/TypeormStore'
+import connectFlash from 'connect-flash';
+import { TypeormStore } from 'connect-typeorm/out';
+import { TypeormStoreRepository } from './repositories/TypeormStore';
 
 // Alterei o includes em tsconfig.json de "src/*.ts" para apenas "src/" Porque NÃO estava Transpilando ALGUNS arquivos de .ts para .js no dist !! <<
 
@@ -44,7 +44,7 @@ AppDataSource.initialize().then(() => {
 
     server.use(cookieParser(process.env.COOKIE_SECRET));
 
-        // Mudei de cookie-session para express-session por causa que as req.flash NÃO tava funcionando !! <<
+    // Mudei de cookie-session para express-session por causa que as req.flash NÃO tava funcionando !! <<
     server.use(session({
         name: 'session_app' || 'session_admin',
         secret: process.env.COOKIE_SECRET as string,
@@ -75,50 +75,50 @@ AppDataSource.initialize().then(() => {
     server.use(express.static(__dirname + '/src/public'));
     server.use(express.static(__dirname + '/dist'));
 
-        // Middleware de Alertas para usar em QUALQUER Rota !! <<
+    // Middleware de Alertas para usar em QUALQUER Rota !! <<
     server.use((req: Request, res: Response, next: NextFunction) => {
         res.locals.alerts = {
-        invalidData: undefined,
-        userExists: undefined,
-        emailExists: undefined,
-        invalidEmail: undefined,
-        successRegister: undefined,
-        differentPasswords: undefined,
-        internalServerError: undefined,
-        errorLogin: undefined,
-        successLogin: undefined,
-        errorForgotPassword: undefined,
-        successToSendEmail: undefined,
-        errorChangeForgotPassword: undefined,
-        successChangeForgotPassword: undefined,
-        passwordAlreadyChanged: undefined,
-        invalidToken: undefined
-        }
-        
-        next();
-    })
+            invalidData: undefined,
+            userExists: undefined,
+            emailExists: undefined,
+            invalidEmail: undefined,
+            successRegister: undefined,
+            differentPasswords: undefined,
+            internalServerError: undefined,
+            errorLogin: undefined,
+            successLogin: undefined,
+            errorForgotPassword: undefined,
+            successToSendEmail: undefined,
+            errorChangeForgotPassword: undefined,
+            successChangeForgotPassword: undefined,
+            passwordAlreadyChanged: undefined,
+            invalidToken: undefined
+        };
 
-        // Middleware de Flash Messages !! <<
+        next();
+    });
+
+    // Middleware de Flash Messages !! <<
     server.use((req: Request, res: Response, next: NextFunction) => {
         res.locals.errorFlash = req.flash('errorFlash');
         res.locals.successFlash = req.flash("successFlash");
         next();
-      });
+    });
 
     server.use(registerLoginRoute);
     server.use(dashboardRoute);
     server.use(administrationRoute);
 
-        // Evita que acesse o URL inicial porque não tem nada (Melhor pro Deploy, se não ia ter que adivinhar as Rotas) !! <<
+    // Evita que acesse o URL inicial porque não tem nada (Melhor pro Deploy, se não ia ter que adivinhar as Rotas) !! <<
     server.get('/', (req: Request, res: Response) => {
         res.redirect('/account');
-    })
+    });
 
-      // Usado para Rotas NÃO EXISTENTES (obviamente tem que ser por Último, DEPOIS de Todas as Rotas Usadas) !! <<
+    // Usado para Rotas NÃO EXISTENTES (obviamente tem que ser por Último, DEPOIS de Todas as Rotas Usadas) !! <<
     server.get('*', (req: Request, res: Response) => {
         res.render(notFoundEJS);
-    })
-    
+    });
+
     return server.listen(process.env.PORT || port, () => {
         if (process.env.NODE_ENV === 'production') {
             console.log('Servidor rodando remotamente no Render !');
@@ -127,5 +127,5 @@ AppDataSource.initialize().then(() => {
         else {
             console.log(`Servidor rodando localmente em ${localHost}:${port}`);
         }
-    })
+    });
 }).catch((error) => console.log(error));
