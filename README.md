@@ -11,6 +11,7 @@ https://www.linkedin.com/in/ocauasoares/
 
 ## Hospedado/Deploy no Render:
 https://crud-web-blog.onrender.com/ <br>
+**ATENÇÃO:** Caso o Deploy não tenha acesso em um determinado período de tempo, ele ficará offline até que tenha algum acesso. Então, caso o link demore a carregar, é completamente normal e basta esperar para utilizar o site.
 
 ### Rota para **administração**:
 https://crud-web-blog.onrender.com/admin <br>
